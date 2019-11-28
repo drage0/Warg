@@ -6,7 +6,7 @@
 SOURCE_DIR=./src
 OUTPUT_DIR=./out
 BUILD_DIR=./build
-LIBS=-llua5.3
+LIBS=-llua5.3 -lSDL2
 CC=clang
 CFLAGS=-g
 

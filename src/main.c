@@ -5,7 +5,13 @@
  */
 #include <stdio.h>
 #include <string.h>
+#include <SDL2/SDL.h>
 #include "lua.h"
+
+static SDL_Window *window;
+static SDL_Renderer *renderer;
+static const int WINDOW_WIDTH  = 800;
+static const int WINDOW_HEIGHT = 600;
 
 static const char * restrict const PROMPT_LUA = "Lua] ";
 
@@ -20,6 +26,10 @@ main(int argc, char **argv)
 	char buffer[256];
 	int havecommand, error;
 	lua_State *lstate;
+
+	SDL_Init(SDL_INIT_EVERYTHING);
+	window   = SDL_CreateWindow("$title", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
 
 	lstate = luaL_newstate();
 	luaL_openlibs(lstate);
@@ -39,5 +49,8 @@ main(int argc, char **argv)
 	}
 	lua_close(lstate);
 
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
 	return 0;
 }
