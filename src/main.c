@@ -15,6 +15,22 @@ static const int WINDOW_HEIGHT = 600;
 
 static const char * restrict const PROMPT_LUA = "Lua] ";
 
+static void window_close(void)
+{
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+}
+
+/*
+ * Lua functions - window manipulation.
+ */
+static int lua_window_close(lua_State *state)
+{
+	window_close();
+	lua_pushnumber(state, 0);
+	return 1;
+}
+
 inline static void prompt(FILE * const f)
 {
 	fputs(PROMPT_LUA, f);
@@ -33,6 +49,8 @@ main(int argc, char **argv)
 
 	lstate = luaL_newstate();
 	luaL_openlibs(lstate);
+	lua_pushcfunction(lstate, lua_window_close);
+	lua_setglobal(lstate, "window_close");
 	havecommand = 1;
 	while (havecommand)
 	{
