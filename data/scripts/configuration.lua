@@ -11,3 +11,9 @@ window =
 	title  = "The Mánagarmr project.",
 	vsync  = 1
 }
+
+--[[
+-- Keybind examples
+--]]
+bind('f10', exit);
+bind('w', window_restart);
