@@ -15,7 +15,8 @@ static const int WINDOW_HEIGHT = 600;
 
 static const char * restrict const PROMPT_LUA = "Lua] ";
 
-static void window_close(void)
+static void
+window_close(void)
 {
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
@@ -24,14 +25,16 @@ static void window_close(void)
 /*
  * Lua functions - window manipulation.
  */
-static int lua_window_close(lua_State *state)
+static int
+lua_window_close(lua_State *state)
 {
 	window_close();
 	lua_pushnumber(state, 0);
 	return 1;
 }
 
-inline static void prompt(FILE * const f)
+inline static void
+prompt(FILE * const f)
 {
 	fputs(PROMPT_LUA, f);
 }
