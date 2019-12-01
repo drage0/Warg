@@ -45,6 +45,23 @@ lua_interpreter_close(lua_State *state)
 	return 1;
 }
 
+/*
+ * Lua functions - system.
+ */
+#define LUAFUNC_RETURN_SYSTEM_BIND (-3)
+static int
+lua_system_bind(lua_State *lstate)
+{
+	const char* key;
+	const char* function;
+	key      = lua_tostring(lstate, -2);
+	function = lua_tostring(lstate, -1);
+	printf("Binding %s to %s.\n", key, function);
+	lua_pop(lstate, 2);
+	lua_pushnumber(lstate, LUAFUNC_RETURN_SYSTEM_BIND);
+	return 1;
+}
+
 inline static void
 prompt(FILE * const f)
 {
@@ -99,6 +116,8 @@ main(int argc, char **argv)
 	lua_setglobal(lstate, "window_close");
 	lua_pushcfunction(lstate, lua_interpreter_close);
 	lua_setglobal(lstate, "close");
+	lua_pushcfunction(lstate, lua_system_bind);
+	lua_setglobal(lstate, "bind");
 
 	r = 1;
 	while(r)
