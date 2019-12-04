@@ -7,7 +7,7 @@ SOURCE_DIR=./src
 OUTPUT_DIR=./out
 BUILD_DIR=./build
 DATA_DIR=./data
-LUA_DIR=./Sköll
+LUA_DIR=./Skoll
 
 all: prepare lua program
 
