@@ -10,9 +10,9 @@
 #pragma once
 #include <stdio.h>
 
-#define STR_INFO "[i] %s"
-#define STR_ISSUE "[X] %s"
-#define STR_WARNING "[w] %s"
+#define STR_INFO "[i] %s \n"
+#define STR_ISSUE "[X] %s \n"
+#define STR_WARNING "[w] %s \n"
 
 #define printinfo(x) fprintf(stdout, STR_INFO, x)
 #define printissue(x) fprintf(stdout, STR_ISSUE, x)
