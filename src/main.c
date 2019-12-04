@@ -7,6 +7,7 @@
 #include <string.h>
 #include <SDL2/SDL.h>
 #include "lua.h"
+#include "utility.h"
 
 static SDL_Window *window;
 static SDL_Renderer *renderer;
@@ -100,6 +101,22 @@ stdioinput(lua_State *lstate)
 	}
 }
 
+/*
+ * Welcome message, the first message that is printed.
+ */
+#define AS_STR_EX(s) #s
+#define AS_STR(s) AS_STR_EX(s)
+#define WARG_SDLVERSION AS_STR(SDL_MAJOR_VERSION)"."AS_STR(SDL_MINOR_VERSION)"."AS_STR(SDL_PATCHLEVEL)
+inline static void
+welcomemessage(void)
+{
+	printinfo("- Mánagarmr project -");
+	printinfo("- --------- ------- -");
+	printinfo("- Compiler-  "__VERSION__);
+	printinfo("- Timestamp- "__DATE__" @ "__TIME__);
+	printinfo("- SDL-       "WARG_SDLVERSION);
+}
+
 int
 main(int argc, char **argv)
 {
@@ -107,6 +124,7 @@ main(int argc, char **argv)
 	int r;
 	lua_State *lstate;
 
+	welcomemessage();
 	SDL_Init(SDL_INIT_EVERYTHING);
 	window   = SDL_CreateWindow("$title", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
