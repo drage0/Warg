@@ -20,6 +20,7 @@ all:	$(PLAT)
 
 $(PLATS) clean:
 	@printf '\e[34m'
+	mkdir -p out
 	cd src && $(MAKE) $@
 	@printf '\e[39m'
 

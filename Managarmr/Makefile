@@ -1,26 +1,16 @@
 # Project
 # Mánagarmr
 #
-# 1. 12. 2019.
+# 5. 12. 2019.
 #
-OUTPUT_DIR=../out
-BUILD_DIR=../build
-DATA_DIR=./data
-LUA_DIR=./Skoll
-LIBS=-llua -lSDL2
-CC=clang
-CFLAGS=-g
+SOURCE_DIR=./src
+BUILD_DIR=./build
+OUT_DIR=./out
 
+all: prepare
+	cd $(SOURCE_DIR) && $(MAKE) all
 
-all:  $(BUILD_DIR)/main.o $(OUTPUT_DIR)/managarmr
+prepare:
+	mkdir -p $(BUILD_DIR) $(OUT_DIR)
 
-$(OUTPUT_DIR)/managarmr: $(BUILD_DIR)/main.o
-	$(CC) $(BUILD_DIR)/main.o -o $(OUTPUT_DIR)/managarmr $(LIBS)
-
-$(BUILD_DIR)/main.o: main.c lua.h
-	$(CC) $(CFLAGS) -c main.c -o $(BUILD_DIR)/main.o
-
-clean:
-	-rm -rvf $(OUTPUT_DIR)/* $(BUILD_DIR)/*
-
-.PHONY: lua clean prepare all
+.PHONY: prepare all

@@ -1,3 +1,1 @@
-#!/bin/sh
-./out/managarmr
-
+./Managarmr/out/managarmr

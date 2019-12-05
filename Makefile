@@ -3,26 +3,19 @@
 #
 # 28. 11. 2019.
 #
-SOURCE_DIR=./Managarmr
-OUTPUT_DIR=./out
-BUILD_DIR=./build
-DATA_DIR=./data
-LUA_DIR=./Skoll
+MANAGARMR_MAKEDIR=./Managarmr
+SKOLL_MAKEDIR=./Skoll
 
-all: prepare lua program
+all: lua program
 
 program:
-	cd $(SOURCE_DIR) && $(MAKE) all
+	cd $(MANAGARMR_MAKEDIR) && $(MAKE) all
 
 lua:
-	cd $(LUA_DIR) && $(MAKE) linux
-
-prepare:
-	mkdir -pv $(OUTPUT_DIR) $(BUILD_DIR)
-	ln -svf ../$(DATA_DIR) $(OUTPUT_DIR)/
+	cd $(SKOLL_MAKEDIR) && $(MAKE) linux
 
 clean:
 	cd $(SOURCE_DIR) && $(MAKE) clean
-	cd $(LUA_DIR)    && $(MAKE) clean
+	cd $(SKOLL_MAKEDIR)    && $(MAKE) clean
 
-.PHONY: lua program clean prepare all
+.PHONY: lua program clean all
