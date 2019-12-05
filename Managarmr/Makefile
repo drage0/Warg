@@ -10,6 +10,9 @@ OUT_DIR=./out
 all: prepare
 	cd $(SOURCE_DIR) && $(MAKE) all
 
+clean:
+	cd $(SOURCE_DIR) && $(MAKE) clean
+
 prepare:
 	mkdir -p $(BUILD_DIR) $(OUT_DIR)
 

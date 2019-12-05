@@ -15,7 +15,7 @@ lua:
 	cd $(SKOLL_MAKEDIR) && $(MAKE) linux
 
 clean:
-	cd $(SOURCE_DIR) && $(MAKE) clean
+	cd $(MANAGARMR_MAKEDIR) && $(MAKE) clean
 	cd $(SKOLL_MAKEDIR)    && $(MAKE) clean
 
 .PHONY: lua program clean all
