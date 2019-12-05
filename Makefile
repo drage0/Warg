@@ -3,7 +3,7 @@
 #
 # 28. 11. 2019.
 #
-SOURCE_DIR=./src
+SOURCE_DIR=./Managarmr
 OUTPUT_DIR=./out
 BUILD_DIR=./build
 DATA_DIR=./data
