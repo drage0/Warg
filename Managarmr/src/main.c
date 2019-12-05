@@ -69,7 +69,7 @@ prompt(FILE * const f)
 	fputs(PROMPT_LUA, f);
 }
 
-inline static void
+static void
 stdioinput(lua_State *lstate)
 {
 	char buffer[256];
@@ -95,6 +95,7 @@ stdioinput(lua_State *lstate)
 			interpreter_open = 0;
 			break;
 		case LUAFUNC_RETURN_WINDOW_CLOSE:
+		case LUAFUNC_RETURN_SYSTEM_BIND:
 		default:
 			break;
 		}
