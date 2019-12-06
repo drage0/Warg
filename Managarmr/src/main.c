@@ -63,12 +63,6 @@ lua_system_bind(lua_State *lstate)
 	return 1;
 }
 
-inline static void
-prompt(FILE * const f)
-{
-	fputs(PROMPT_LUA, f);
-}
-
 static void
 stdioinput(lua_State *lstate)
 {
@@ -77,13 +71,13 @@ stdioinput(lua_State *lstate)
 	while (interpreter_open)
 	{
 		/* Push the entered line as a chunk and call (execute) it. */
-		prompt(stdout);
+		printluaprompt;
 		interpreter_open = (fgets(buffer, sizeof(buffer), stdin) != NULL);
 		error            = luaL_loadbuffer(lstate, buffer, strlen(buffer), "command") || lua_pcall(lstate, 0, 2, 0);
 		if (error)
 		{
-			prompt(stderr);
-			fprintf(stderr, "%s\n", lua_tostring(lstate, -1));
+			printluaprompt;
+			printlua(lua_tostring(lstate, -1));
 			lua_pop(lstate, 1);
 		}
 		/* Check the return value (for special functionality) */
