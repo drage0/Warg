@@ -112,6 +112,27 @@ welcomemessage(void)
 	printinfo("- SDL-       "WARG_SDLVERSION);
 }
 
+/*
+ * Execute the lua script contained in the given file.
+ * Returns 0 on success, 1 on error.
+ */
+static int
+executescript(lua_State *lstate, const char* path)
+{
+	int ret = luaL_dofile(lstate, path);
+	if (ret != 0)
+	{
+		char information[128];
+		snprintf(information, 128, "Execution of \"%s\" failed. luaL_dofile returned %d.", path, ret);
+		printwarning(information);
+		printluaprompt;
+		printlua(lua_tostring(lstate, -1));
+		lua_pop(lstate, 1);
+		return 1;
+	}
+	return 0;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -131,6 +152,7 @@ main(int argc, char **argv)
 	lua_setglobal(lstate, "close");
 	lua_pushcfunction(lstate, lua_system_bind);
 	lua_setglobal(lstate, "bind");
+	executescript(lstate, "./data/scripts/configuration.lua");
 
 	r = 1;
 	while(r)
