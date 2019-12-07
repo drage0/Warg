@@ -16,6 +16,8 @@ static const int WINDOW_HEIGHT = 600;
 
 static const char * restrict const PROMPT_LUA = "Lua] ";
 
+static int interpreter_open = 0;
+
 static void
 window_close(void)
 {
@@ -26,72 +28,61 @@ window_close(void)
 /*
  * Lua functions - window manipulation.
  */
-#define LUAFUNC_RETURN_WINDOW_CLOSE (-1)
 static int
 lua_window_close(lua_State *state)
 {
 	window_close();
-	lua_pushnumber(state, LUAFUNC_RETURN_WINDOW_CLOSE);
-	return 1;
+	return 0;
 }
 
 /*
  * Lua functions - interpreter manipulation.
  */
-#define LUAFUNC_RETURN_INTERPRETER_CLOSE (-2)
 static int
 lua_interpreter_close(lua_State *state)
 {
-	lua_pushnumber(state, LUAFUNC_RETURN_INTERPRETER_CLOSE);
-	return 1;
+	interpreter_open = 0;
+	return 0;
 }
 
 /*
  * Lua functions - system.
  */
-#define LUAFUNC_RETURN_SYSTEM_BIND (-3)
 static int
 lua_system_bind(lua_State *lstate)
 {
-	const char* key;
-	const char* function;
+	const char *key, *sequence;
+	/*
+	lua_CFunction function;
 	key      = lua_tostring(lstate, -2);
-	function = lua_tostring(lstate, -1);
-	printf("Binding %s to %s.\n", key, function);
+	function = lua_tocfunction(lstate, -1);
+	printf("Binding %-6s to %p.\n", key, function);
 	lua_pop(lstate, 2);
-	lua_pushnumber(lstate, LUAFUNC_RETURN_SYSTEM_BIND);
-	return 1;
+	function(lstate);
+	*/
+	key      = lua_tostring(lstate, -2);
+	sequence = lua_tostring(lstate, -1);
+	printf("Binding %-6s to \"%s\".\n", key, sequence);
+	return 0;
 }
 
 static void
 stdioinput(lua_State *lstate)
 {
 	char buffer[256];
-	int error, ret, interpreter_open = 1;
+	int error, ret;
+	interpreter_open = 1;
 	while (interpreter_open)
 	{
 		/* Push the entered line as a chunk and call (execute) it. */
 		printluaprompt;
 		interpreter_open = (fgets(buffer, sizeof(buffer), stdin) != NULL);
-		error            = luaL_loadbuffer(lstate, buffer, strlen(buffer), "command") || lua_pcall(lstate, 0, 2, 0);
+		error            = luaL_loadbuffer(lstate, buffer, strlen(buffer), "command") || lua_pcall(lstate, 0, 1, 0);
 		if (error)
 		{
 			printluaprompt;
 			printlua(lua_tostring(lstate, -1));
 			lua_pop(lstate, 1);
-		}
-		/* Check the return value (for special functionality) */
-		ret = lua_tonumber(lstate, 0);
-		printf("Retrived %d\n",  ret);
-		switch (ret)
-		{
-		case LUAFUNC_RETURN_INTERPRETER_CLOSE:
-			interpreter_open = 0;
-			break;
-		case LUAFUNC_RETURN_WINDOW_CLOSE:
-		case LUAFUNC_RETURN_SYSTEM_BIND:
-		default:
-			break;
 		}
 	}
 }
