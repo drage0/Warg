@@ -164,6 +164,8 @@ main(int argc, char **argv)
 				}
 			}
 		}
+		/* Render the frame. */
+		SDL_RenderPresent(renderer);
 	}
 
 	lua_close(lstate);
