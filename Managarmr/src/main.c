@@ -9,10 +9,20 @@
 #include "lua.h"
 #include "utility.h"
 
+#define KEYBIND_SEQUENCE_MAX_LENGTH 256
+#define KEYBIND_MAX 64
+struct KeyBind
+{
+	SDL_Keycode key;
+	char sequence[KEYBIND_SEQUENCE_MAX_LENGTH];
+};
+
 static SDL_Window *window;
 static SDL_Renderer *renderer;
 static const int WINDOW_WIDTH  = 800;
 static const int WINDOW_HEIGHT = 600;
+static struct KeyBind keybinds[KEYBIND_MAX];
+static unsigned int keybind_count = 0;
 
 static int interpreter_open = 0;
 
@@ -49,6 +59,7 @@ lua_interpreter_close(lua_State *state)
 static int
 lua_system_bind(lua_State *lstate)
 {
+	struct KeyBind bind;
 	const char *key, *sequence;
 	/*
 	lua_CFunction function;
@@ -61,6 +72,16 @@ lua_system_bind(lua_State *lstate)
 	key      = lua_tostring(lstate, -2);
 	sequence = lua_tostring(lstate, -1);
 	printf("Binding %-6s to \"%s\".\n", key, sequence);
+	bind.key = SDL_GetKeyFromName(key);
+	if (bind.key == SDLK_UNKNOWN)
+	{
+		printwarning("The key is unknown. Not binding.");
+		return 0;
+	}
+	strncpy(bind.sequence, sequence, KEYBIND_SEQUENCE_MAX_LENGTH);
+	/* Copy the created structure. */
+	memcpy(&keybinds[keybind_count], &bind, sizeof(struct KeyBind));
+	keybind_count += 1;
 	return 0;
 }
 
@@ -155,12 +176,21 @@ main(int argc, char **argv)
 			}
 			else if (e.type == SDL_KEYDOWN)
 			{
-				switch (e.key.keysym.sym)
+				unsigned int i;
+				SDL_Keycode keycode = e.key.keysym.sym;
+				switch (keycode)
 				{
 				case SDLK_BACKQUOTE:
 					stdioinput(lstate);
 				default:
 					break;
+				}
+				for (i = 0; i < keybind_count; i++)
+				{
+					if (keycode == keybinds[i].key)
+					{
+						printf("Execute %s!\n", keybinds[i].sequence);
+					}
 				}
 			}
 		}
