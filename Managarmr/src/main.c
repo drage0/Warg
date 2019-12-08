@@ -1,6 +1,6 @@
 /*
  * main.c
- * Part of Mánagarmr project
+ * Part of Warg project
  * 28. 11. 2019.
  */
 #include <stdio.h>

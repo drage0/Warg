@@ -1,6 +1,6 @@
 /*
  * utility.h
- * Part of Mánagarmr project
+ * Part of Warg project
  * 4. 12. 2019.
  *
  * Definition of utilites: functions, constants and macros.

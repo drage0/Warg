@@ -1,6 +1,6 @@
 /*
  * lua.h
- * Part of Mánagarmr project
+ * Part of Warg project
  * 28. 11. 2019.
  *
  * This header exists to ease the change of lua header files' directory.
