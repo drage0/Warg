@@ -14,8 +14,6 @@ static SDL_Renderer *renderer;
 static const int WINDOW_WIDTH  = 800;
 static const int WINDOW_HEIGHT = 600;
 
-static const char * restrict const PROMPT_LUA = "Lua] ";
-
 static int interpreter_open = 0;
 
 static void
