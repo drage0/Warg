@@ -35,7 +35,7 @@ window_close(void)
 }
 
 inline static void
-sys_quit(void)
+sys_exit(void)
 {
 	sys_running = 0;
 }
@@ -93,9 +93,9 @@ lua_system_bind(lua_State *lstate)
 }
 
 static int
-lua_system_quit(lua_State *lstate)
+lua_system_exit(lua_State *lstate)
 {
-	sys_quit();
+	sys_exit();
 	return 0;
 }
 
@@ -191,7 +191,9 @@ main(int argc, char **argv)
 	lua_setglobal(lstate, "close");
 	lua_pushcfunction(lstate, lua_system_bind);
 	lua_setglobal(lstate, "bind");
-	lua_pushcfunction(lstate, lua_system_quit);
+	lua_pushcfunction(lstate, lua_system_exit);
+	lua_setglobal(lstate, "exit");
+	lua_pushcfunction(lstate, lua_system_exit);
 	lua_setglobal(lstate, "quit");
 	executescript(lstate, "./data/scripts/configuration.lua");
 
@@ -202,7 +204,7 @@ main(int argc, char **argv)
 		{
 			if (e.type == SDL_QUIT)
 			{
-				sys_quit();
+				sys_exit();
 			}
 			else if (e.type == SDL_KEYDOWN)
 			{

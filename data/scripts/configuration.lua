@@ -15,5 +15,5 @@ window =
 --[[
 -- Keybind examples
 --]]
-bind('f10', "quit()");
+bind('f10', "exit()");
 bind('w', "close()");
