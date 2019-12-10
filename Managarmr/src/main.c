@@ -141,6 +141,24 @@ executescript(lua_State *lstate, const char* path)
 	return 0;
 }
 
+/*
+ * Execute the lua script contained in the given string.
+ * Returns 0 on success, 1 on error.
+ */
+static int
+executesequence(lua_State *lstate, const char *command)
+{
+	int ret;
+	printlua("Execute %s!", command);
+	ret = luaL_loadstring(lstate, command) || lua_pcall(lstate, 0, 0, 0);
+	if (ret)
+	{
+		printlua("%s", lua_tostring(lstate, -1));
+		lua_pop(lstate, 1);
+	}
+	return ret;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -187,7 +205,7 @@ main(int argc, char **argv)
 				{
 					if (keycode == keybinds[i].key)
 					{
-						printlua("Execute %s!", keybinds[i].sequence);
+						executesequence(lstate, keybinds[i].sequence);
 					}
 				}
 			}
