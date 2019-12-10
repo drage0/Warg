@@ -71,11 +71,11 @@ lua_system_bind(lua_State *lstate)
 	*/
 	key      = lua_tostring(lstate, -2);
 	sequence = lua_tostring(lstate, -1);
-	printf("Binding %-6s to \"%s\".\n", key, sequence);
+	printinfo("Binding %-6s to \"%s\".", key, sequence);
 	bind.key = SDL_GetKeyFromName(key);
 	if (bind.key == SDLK_UNKNOWN)
 	{
-		printwarning("The key is unknown. Not binding.");
+		printwarning("%s", "The key is unknown. Not binding.");
 		return 0;
 	}
 	strncpy(bind.sequence, sequence, KEYBIND_SEQUENCE_MAX_LENGTH);
@@ -100,7 +100,7 @@ stdioinput(lua_State *lstate)
 		if (error)
 		{
 			printluaprompt;
-			printlua(lua_tostring(lstate, -1));
+			printlua("%s\n", lua_tostring(lstate, -1));
 			lua_pop(lstate, 1);
 		}
 	}
@@ -115,11 +115,11 @@ stdioinput(lua_State *lstate)
 inline static void
 welcomemessage(void)
 {
-	printinfo("- Warg project -");
-	printinfo("- ---- ------- -");
-	printinfo("- Compiler-  "__VERSION__);
-	printinfo("- Timestamp- "__DATE__" @ "__TIME__);
-	printinfo("- SDL-       "WARG_SDLVERSION);
+	printinfo("- Warg project -",0);
+	printinfo("- ---- ------- -",0);
+	printinfo("- Compiler-  %s", __VERSION__);
+	printinfo("- Timestamp- %s @ %s", __DATE__, __TIME__);
+	printinfo("- SDL-       %s", WARG_SDLVERSION);
 }
 
 /*
@@ -132,11 +132,9 @@ executescript(lua_State *lstate, const char* path)
 	int ret = luaL_dofile(lstate, path);
 	if (ret != 0)
 	{
-		char information[128];
-		snprintf(information, 128, "Execution of \"%s\" failed. luaL_dofile returned %d.", path, ret);
-		printwarning(information);
+		printwarning("Execution of \"%s\" failed. luaL_dofile returned %d.", path, ret);
 		printluaprompt;
-		printlua(lua_tostring(lstate, -1));
+		printlua("%s", lua_tostring(lstate, -1));
 		lua_pop(lstate, 1);
 		return 1;
 	}
@@ -189,7 +187,7 @@ main(int argc, char **argv)
 				{
 					if (keycode == keybinds[i].key)
 					{
-						printf("Execute %s!\n", keybinds[i].sequence);
+						printlua("Execute %s!", keybinds[i].sequence);
 					}
 				}
 			}

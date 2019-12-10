@@ -10,14 +10,15 @@
 #pragma once
 #include <stdio.h>
 
-#define STR_INFO "[i] %s \n"
-#define STR_ISSUE "[X] %s \n"
-#define STR_WARNING "[w] %s \n"
-#define STR_LUAPROMPT "Lua] "
-#define STR_LUA "%s \n"
+#define STR_INFO "[i] "
+#define STR_ISSUE "[X] "
+#define STR_WARNING "[w] "
+#define STR_LUA "Lua] "
+#define STR_NEWLINE "\n"
 
-#define printinfo(x) fprintf(stdout, STR_INFO, x)
-#define printissue(x) fprintf(stdout, STR_ISSUE, x)
-#define printwarning(x) fprintf(stdout, STR_WARNING, x)
-#define printluaprompt fputs(STR_LUAPROMPT, stdout);
-#define printlua(x) fprintf(stdout, STR_LUA, x)
+#define printinfo(x,...) fprintf(stdout, STR_INFO x STR_NEWLINE, __VA_ARGS__)
+#define printissue(x,...) fprintf(stdout, STR_ISSUE x STR_NEWLINE, __VA_ARGS__)
+#define printwarning(x,...) fprintf(stdout, STR_WARNING x STR_NEWLINE, __VA_ARGS__)
+#define printluaprompt fputs(STR_LUA, stdout);
+#define printlua(x,...) fprintf(stdout, STR_LUA x STR_NEWLINE, __VA_ARGS__)
+
