@@ -115,8 +115,8 @@ stdioinput(lua_State *lstate)
 inline static void
 welcomemessage(void)
 {
-	printinfo("- Warg project -",0);
-	printinfo("- ---- ------- -",0);
+	printinfo("%s", "- Warg project -");
+	printinfo("%s", "- ---- ------- -");
 	printinfo("- Compiler-  %s", __VERSION__);
 	printinfo("- Timestamp- %s @ %s", __DATE__, __TIME__);
 	printinfo("- SDL-       %s", WARG_SDLVERSION);
