@@ -25,12 +25,19 @@ static struct KeyBind keybinds[KEYBIND_MAX];
 static unsigned int keybind_count = 0;
 
 static int interpreter_open = 0;
+static int sys_running = 1;
 
 static void
 window_close(void)
 {
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
+}
+
+inline static void
+sys_quit(void)
+{
+	sys_running = 0;
 }
 
 /*
@@ -82,6 +89,13 @@ lua_system_bind(lua_State *lstate)
 	/* Copy the created structure. */
 	memcpy(&keybinds[keybind_count], &bind, sizeof(struct KeyBind));
 	keybind_count += 1;
+	return 0;
+}
+
+static int
+lua_system_quit(lua_State *lstate)
+{
+	sys_quit();
 	return 0;
 }
 
@@ -163,7 +177,6 @@ int
 main(int argc, char **argv)
 {
 	SDL_Event e;
-	int r;
 	lua_State *lstate;
 
 	welcomemessage();
@@ -178,17 +191,18 @@ main(int argc, char **argv)
 	lua_setglobal(lstate, "close");
 	lua_pushcfunction(lstate, lua_system_bind);
 	lua_setglobal(lstate, "bind");
+	lua_pushcfunction(lstate, lua_system_quit);
+	lua_setglobal(lstate, "quit");
 	executescript(lstate, "./data/scripts/configuration.lua");
 
-	r = 1;
-	while(r)
+	while(sys_running)
 	{
 		SDL_PumpEvents();
 		while (SDL_PollEvent(&e))
 		{
 			if (e.type == SDL_QUIT)
 			{
-				r = 0;
+				sys_quit();
 			}
 			else if (e.type == SDL_KEYDOWN)
 			{
