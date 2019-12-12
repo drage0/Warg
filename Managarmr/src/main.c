@@ -21,6 +21,7 @@ static SDL_Window *window;
 static SDL_Renderer *renderer;
 static int window_width  = 800;
 static int window_height = 600;
+static int window_vsync  = 1;
 static char window_title[128] = "~mánagarmr";
 static struct KeyBind keybinds[KEYBIND_MAX];
 static unsigned int keybind_count = 0;
@@ -192,6 +193,7 @@ parseconfiguration(lua_State *lstate)
 	{
 		window_width  = fieldvalue(lstate, "width", "window", window_width);
 		window_height = fieldvalue(lstate, "height", "window", window_height);
+		window_vsync  = fieldvalue(lstate, "vsync", "window", window_vsync);
 	}
 	return 0;
 }
@@ -217,6 +219,7 @@ executesequence(lua_State *lstate, const char *command)
 int
 main(int argc, char **argv)
 {
+	Uint32 rendererflags;
 	SDL_Event e;
 	lua_State *lstate;
 
@@ -241,8 +244,13 @@ main(int argc, char **argv)
 	executescript(lstate, "./data/scripts/configuration.lua");
 	parseconfiguration(lstate);
 
+	rendererflags = SDL_RENDERER_ACCELERATED;
+	if (window_vsync)
+	{
+		rendererflags = rendererflags | SDL_RENDERER_PRESENTVSYNC;
+	}
 	window   = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_width, window_height, SDL_WINDOW_SHOWN);
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
+	renderer = SDL_CreateRenderer(window, -1, rendererflags);
 
 	while(sys_running)
 	{
