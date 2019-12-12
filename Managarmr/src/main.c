@@ -156,11 +156,6 @@ executescript(lua_State *lstate, const char* path)
 	return 0;
 }
 
-/*
- * Parse the lua state for the specific values.
- * The special varaibles such as the table 'window' can be used to configure the program.
- */
-
 /* Return the integer field value on success and the passed default value on error. */
 static int
 fieldvalue(lua_State *lstate, const char *field, const char *table, int def)
@@ -180,6 +175,10 @@ fieldvalue(lua_State *lstate, const char *field, const char *table, int def)
 	return value;
 }
 
+/*
+ * Parse the lua state for the specific values.
+ * The special varaibles such as the table 'window' can be used to configure the program.
+ */
 static int
 parseconfiguration(lua_State *lstate)
 {
