@@ -19,8 +19,9 @@ struct KeyBind
 
 static SDL_Window *window;
 static SDL_Renderer *renderer;
-static const int WINDOW_WIDTH  = 800;
-static const int WINDOW_HEIGHT = 600;
+static int window_width  = 800;
+static int window_height = 600;
+static char window_title[128] = "~mánagarmr";
 static struct KeyBind keybinds[KEYBIND_MAX];
 static unsigned int keybind_count = 0;
 
@@ -156,6 +157,47 @@ executescript(lua_State *lstate, const char* path)
 }
 
 /*
+ * Parse the lua state for the specific values.
+ * The special varaibles such as the table 'window' can be used to configure the program.
+ */
+
+/* Return the integer field value on success and the passed default value on error. */
+static int
+fieldvalue(lua_State *lstate, const char *field, const char *table, int def)
+{
+	int value = def;
+	lua_pushstring(lstate, field);
+	lua_gettable(lstate, -2);
+	if (!lua_isnumber(lstate, -1))
+	{
+		printissue("Field %s doesn't hold a number.", field);
+	}
+	else
+	{
+		value = (int) (lua_tonumber(lstate, -1));
+	}
+	lua_pop(lstate, 1);
+	return value;
+}
+
+static int
+parseconfiguration(lua_State *lstate)
+{
+	lua_getglobal(lstate, "window");
+	if (!lua_istable(lstate, -1))
+	{
+		printissue("%s", "'window' is not a valid table.");
+		return 1;
+	}
+	else
+	{
+		window_width  = fieldvalue(lstate, "width", "window", window_width);
+		window_height = fieldvalue(lstate, "height", "window", window_height);
+	}
+	return 0;
+}
+
+/*
  * Execute the lua script contained in the given string.
  * Returns 0 on success, 1 on error.
  */
@@ -181,8 +223,8 @@ main(int argc, char **argv)
 
 	welcomemessage();
 	SDL_Init(SDL_INIT_EVERYTHING);
-	window   = SDL_CreateWindow("$title", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_SHOWN);
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
+
+	/* Begin the Lua state */
 	lstate = luaL_newstate();
 	luaL_openlibs(lstate);
 	lua_pushcfunction(lstate, lua_window_close);
@@ -195,7 +237,13 @@ main(int argc, char **argv)
 	lua_setglobal(lstate, "exit");
 	lua_pushcfunction(lstate, lua_system_exit);
 	lua_setglobal(lstate, "quit");
+
+	/* Execute the configuration script. */
 	executescript(lstate, "./data/scripts/configuration.lua");
+	parseconfiguration(lstate);
+
+	window   = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_width, window_height, SDL_WINDOW_SHOWN);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC);
 
 	while(sys_running)
 	{
