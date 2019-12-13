@@ -176,6 +176,25 @@ fieldvalue(lua_State *lstate, const char *field, int def)
 	return value;
 }
 
+/* Return the string field value on success and the passed default value on error. */
+static const char*
+fieldvalue_str(lua_State *lstate, const char *field, const char *def)
+{
+	const char *value = def;
+	lua_pushstring(lstate, field);
+	lua_gettable(lstate, -2);
+	if (!lua_isstring(lstate, -1))
+	{
+		printissue("Field %s doesn't hold a string.", field);
+	}
+	else
+	{
+		value = (const char*) (lua_tostring(lstate, -1));
+	}
+	lua_pop(lstate, 1);
+	return value;
+}
+
 /*
  * Parse the lua state for the specific values.
  * The special varaibles such as the table 'window' can be used to configure the program.
@@ -191,9 +210,12 @@ parseconfiguration(lua_State *lstate)
 	}
 	else
 	{
+		const char *stringpointer;
 		window_width  = fieldvalue(lstate, "width",  window_width);
 		window_height = fieldvalue(lstate, "height", window_height);
 		window_vsync  = fieldvalue(lstate, "vsync",  window_vsync);
+		stringpointer = fieldvalue_str(lstate, "title", window_title);
+		strncpy(window_title, stringpointer, 128);
 	}
 	return 0;
 }
