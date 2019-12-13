@@ -159,7 +159,7 @@ executescript(lua_State *lstate, const char* path)
 
 /* Return the integer field value on success and the passed default value on error. */
 static int
-fieldvalue(lua_State *lstate, const char *field, int def)
+fieldvalue_int(lua_State *lstate, const char *field, int def)
 {
 	int value = def;
 	lua_pushstring(lstate, field);
@@ -211,9 +211,9 @@ parseconfiguration(lua_State *lstate)
 	else
 	{
 		const char *stringpointer;
-		window_width  = fieldvalue(lstate, "width",  window_width);
-		window_height = fieldvalue(lstate, "height", window_height);
-		window_vsync  = fieldvalue(lstate, "vsync",  window_vsync);
+		window_width  = fieldvalue_int(lstate, "width",  window_width);
+		window_height = fieldvalue_int(lstate, "height", window_height);
+		window_vsync  = fieldvalue_int(lstate, "vsync",  window_vsync);
 		stringpointer = fieldvalue_str(lstate, "title", window_title);
 		strncpy(window_title, stringpointer, 128);
 	}
