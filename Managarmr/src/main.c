@@ -17,12 +17,13 @@ struct KeyBind
 	char sequence[KEYBIND_SEQUENCE_MAX_LENGTH];
 };
 
+#define WINDOW_TITLE_MAX 64
 static SDL_Window *window;
 static SDL_Renderer *renderer;
 static int window_width  = 800;
 static int window_height = 600;
 static int window_vsync  = 1;
-static char window_title[128] = "~mánagarmr";
+static char window_title[WINDOW_TITLE_MAX] = "~mánagarmr";
 static struct KeyBind keybinds[KEYBIND_MAX];
 static unsigned int keybind_count = 0;
 
@@ -215,7 +216,7 @@ parseconfiguration(lua_State *lstate)
 		window_height = fieldvalue_int(lstate, "height", window_height);
 		window_vsync  = fieldvalue_int(lstate, "vsync",  window_vsync);
 		stringpointer = fieldvalue_str(lstate, "title", window_title);
-		strncpy(window_title, stringpointer, 128);
+		strncpy(window_title, stringpointer, WINDOW_TITLE_MAX);
 	}
 	return 0;
 }
