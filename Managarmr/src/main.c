@@ -265,7 +265,10 @@ main(int argc, char **argv)
 
 	/* Execute the configuration script. */
 	executescript(lstate, "./data/scripts/configuration.lua");
-	parseconfiguration(lstate);
+	if (parseconfiguration(lstate))
+	{
+		printissue("%s", "Configuration file was not parsed correctly!");
+	}
 
 	rendererflags = SDL_RENDERER_ACCELERATED;
 	if (window_vsync)
