@@ -44,16 +44,6 @@ sys_exit(void)
 }
 
 /*
- * Lua functions - window manipulation.
- */
-static int
-lua_window_close(lua_State *state)
-{
-	window_close();
-	return 0;
-}
-
-/*
  * Lua functions - interpreter manipulation.
  */
 static int
@@ -252,8 +242,6 @@ main(int argc, char **argv)
 	/* Begin the Lua state */
 	lstate = luaL_newstate();
 	luaL_openlibs(lstate);
-	lua_pushcfunction(lstate, lua_window_close);
-	lua_setglobal(lstate, "window_close");
 	lua_pushcfunction(lstate, lua_interpreter_close);
 	lua_setglobal(lstate, "close");
 	lua_pushcfunction(lstate, lua_system_bind);
