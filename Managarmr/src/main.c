@@ -229,6 +229,24 @@ executesequence(lua_State *lstate, const char *command)
 	return ret;
 }
 
+/*
+ * Draw the statusbar.
+ */
+#define STATUSBAR_COLOUR 0xFF, 0x00, 0x00, 0xFF
+#define STATUSBAR_Y ((int)(window_height*4.0/5.0))
+#define STATUSBAR_H (window_height-STATUSBAR_Y)
+void
+statusbar_draw(void)
+{
+	SDL_Rect statusbar;
+	statusbar.x = 0;
+	statusbar.y = STATUSBAR_Y;
+	statusbar.w = window_width;
+	statusbar.h = STATUSBAR_H;
+	SDL_SetRenderDrawColor(renderer, STATUSBAR_COLOUR);
+	SDL_RenderFillRect(renderer, &statusbar);
+}
+
 int
 main(int argc, char **argv)
 {
@@ -296,6 +314,7 @@ main(int argc, char **argv)
 			}
 		}
 		/* Render the frame. */
+		statusbar_draw();
 		SDL_RenderPresent(renderer);
 	}
 
