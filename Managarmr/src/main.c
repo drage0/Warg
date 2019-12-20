@@ -247,12 +247,24 @@ statusbar_draw(void)
 	SDL_RenderFillRect(renderer, &statusbar);
 }
 
+/*
+ * TODO /ideas/
+ */
+void
+catchunits(const int point0[2], const int point1[2])
+{
+	return;
+}
+
+#define SELECTION_COLOUR 0x00, 0xFF, 0x00, 0x69
 int
 main(int argc, char **argv)
 {
 	Uint32 rendererflags;
 	SDL_Event e;
 	lua_State *lstate;
+	int catch_start[2], catch_current[2];
+	int catching;
 
 	welcomemessage();
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -283,7 +295,9 @@ main(int argc, char **argv)
 	}
 	window   = SDL_CreateWindow(window_title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_width, window_height, SDL_WINDOW_SHOWN);
 	renderer = SDL_CreateRenderer(window, -1, rendererflags);
+	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
+	catching = 0;
 	while(sys_running)
 	{
 		SDL_PumpEvents();
@@ -312,9 +326,48 @@ main(int argc, char **argv)
 					}
 				}
 			}
+			else if (e.type == SDL_MOUSEBUTTONDOWN)
+			{
+				if (e.button.button == SDL_BUTTON_LEFT)
+				{
+					catch_start[0] = e.button.x;
+					catch_start[1] = e.button.y;
+					/* Only start catching if the mouse was clicked on the board! */
+					catching = (catch_start[1] < STATUSBAR_Y);
+				}
+			}
+			else if (e.type == SDL_MOUSEBUTTONUP)
+			{
+				if (e.button.button == SDL_BUTTON_LEFT)
+				{
+					catchunits(&catch_start[0], &catch_current[0]);
+					catching = 0;
+				}
+			}
+			else if (e.type == SDL_MOUSEMOTION)
+			{
+				catch_current[0] = e.motion.x;
+				catch_current[1] = e.motion.y;
+				if (catch_current[1] > STATUSBAR_Y)
+				{
+					catch_current[1] = STATUSBAR_Y;
+				}
+			}
 		}
 		/* Render the frame. */
+		SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
+		SDL_RenderClear(renderer);
 		statusbar_draw();
+		if (catching)
+		{
+			SDL_Rect rect;
+			rect.x = catch_start[0];
+			rect.y = catch_start[1];
+			rect.w = catch_current[0]-catch_start[0];
+			rect.h = catch_current[1]-catch_start[1];
+			SDL_SetRenderDrawColor(renderer, SELECTION_COLOUR);
+			SDL_RenderFillRect(renderer, &rect);
+		}
 		SDL_RenderPresent(renderer);
 	}
 
