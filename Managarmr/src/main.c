@@ -26,6 +26,7 @@ static int window_vsync  = 1;
 static char window_title[WINDOW_TITLE_MAX] = "~mánagarmr";
 static struct KeyBind keybinds[KEYBIND_MAX];
 static unsigned int keybind_count = 0;
+static int selection_colour[4] = {255, 0, 0, 255};
 
 static int interpreter_open = 0;
 static int sys_running = 1;
@@ -193,6 +194,7 @@ fieldvalue_str(lua_State *lstate, const char *field, const char *def)
 static int
 parseconfiguration(lua_State *lstate)
 {
+	int i;
 	lua_getglobal(lstate, "window");
 	if (!lua_istable(lstate, -1))
 	{
@@ -207,6 +209,23 @@ parseconfiguration(lua_State *lstate)
 		window_vsync  = fieldvalue_int(lstate, "vsync",  window_vsync);
 		stringpointer = fieldvalue_str(lstate, "title", window_title);
 		strncpy(window_title, stringpointer, WINDOW_TITLE_MAX);
+	}
+	lua_getglobal(lstate, "selection_colour");
+	if (!lua_istable(lstate, -1))
+	{
+		printissue("'%s' is not a valid table.", "selection_colour");
+		return 1;
+	}
+	lua_pushnil(lstate);
+	for (i = 0; i < 4; i++)
+	{
+		if (lua_next(lstate, -2) == 0)
+		{
+			printissue("'%s' table/array/ does not have enough elements!", "selection_colour");
+			return 1;
+		}
+		selection_colour[i] = lua_tointeger(lstate, -1);
+		lua_pop(lstate, 1);
 	}
 	return 0;
 }
@@ -256,7 +275,6 @@ catchunits(const int point0[2], const int point1[2])
 	return;
 }
 
-#define SELECTION_COLOUR 0x00, 0xFF, 0x00, 0x69
 int
 main(int argc, char **argv)
 {
@@ -365,7 +383,7 @@ main(int argc, char **argv)
 			rect.y = catch_start[1];
 			rect.w = catch_current[0]-catch_start[0];
 			rect.h = catch_current[1]-catch_start[1];
-			SDL_SetRenderDrawColor(renderer, SELECTION_COLOUR);
+			SDL_SetRenderDrawColor(renderer, selection_colour[0], selection_colour[1], selection_colour[2], selection_colour[3]);
 			SDL_RenderFillRect(renderer, &rect);
 		}
 		SDL_RenderPresent(renderer);

@@ -12,6 +12,8 @@ window =
 	vsync  = 1
 }
 
+selection_colour = {0, 255, 0, 42};
+
 --[[
 -- Keybind examples
 --]]
