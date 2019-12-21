@@ -3,3 +3,5 @@ out/
 *.o
 *.swp
 .vscode/
+.kdev4
+*.kdev4
