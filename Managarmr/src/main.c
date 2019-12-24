@@ -289,7 +289,34 @@ statusbar_draw(void)
 	SDL_RenderFillRect(renderer, &statusbar);
 }
 
+/*
+ * TODO /ideas/
+ */
+static int caughtunits[512];
+void
+catchunits(SDL_Rect net)
+{
+	int i;
+	printinfo("net- %d %d %d %d", net.x, net.y, net.w, net.h);
+	memset(caughtunits, 0, sizeof(caughtunits));
+	for (i = 0; i < being_count; i++)
+	{
+		SDL_Rect br, intr;
+		br.x = beings[i].x;
+		br.y = beings[i].y;
+		br.w = beings[i].w;
+		br.h = beings[i].h;
+		if (SDL_IntersectRect(&net, &br, &intr))
+		{
+			printinfo("%s %d %d %d %d", "Caught.", intr.x, intr.y, intr.w, intr.h);
+			caughtunits[i] = 1;
+		}
+	}
+	return;
+}
+
 #define BEING_COLOUR 0xFF, 0xFF, 0xFF, 0xFF
+#define COLOUR_BEINGCOORD 0xFF, 0x00, 0x00, 0xFF
 static void
 beings_draw(void)
 {
@@ -298,21 +325,20 @@ beings_draw(void)
 	{
 		SDL_Rect beingrect;
 		beingrect.x = beings[i].x;
-		beingrect.y = beings[i].x;
+		beingrect.y = beings[i].y;
 		beingrect.w = beings[i].w;
 		beingrect.h = beings[i].h;
 		SDL_SetRenderDrawColor(renderer, BEING_COLOUR);
 		SDL_RenderFillRect(renderer, &beingrect);
+		if (caughtunits[i])
+		{
+			beingrect.x -= 4;
+			beingrect.y -= 4;
+			beingrect.w += 8;
+			beingrect.h += 8;
+			SDL_RenderDrawRect(renderer, &beingrect);
+		}
 	}
-}
-
-/*
- * TODO /ideas/
- */
-void
-catchunits(const int point0[2], const int point1[2])
-{
-	return;
 }
 
 int
@@ -321,8 +347,10 @@ main(int argc, char **argv)
 	Uint32 rendererflags;
 	SDL_Event e;
 	lua_State *lstate;
-	int catch_start[2], catch_current[2];
+	SDL_Rect catch_net;
+	SDL_Rect fade_net;
 	int catching;
+	int fade_net_alpha;
 
 	welcomemessage();
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -356,6 +384,7 @@ main(int argc, char **argv)
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 	catching = 0;
+	fade_net_alpha = selection_colour[3];
 	beings_spawn();
 	while(sys_running)
 	{
@@ -389,27 +418,40 @@ main(int argc, char **argv)
 			{
 				if (e.button.button == SDL_BUTTON_LEFT)
 				{
-					catch_start[0] = e.button.x;
-					catch_start[1] = e.button.y;
+					catch_net.x = e.button.x;
+					catch_net.y = e.button.y;
+					catch_net.w = 0;
+					catch_net.h = 0;
 					/* Only start catching if the mouse was clicked on the board! */
-					catching = (catch_start[1] < STATUSBAR_Y);
+					catching = (catch_net.y < STATUSBAR_Y);
 				}
 			}
 			else if (e.type == SDL_MOUSEBUTTONUP)
 			{
 				if (e.button.button == SDL_BUTTON_LEFT)
 				{
-					catchunits(&catch_start[0], &catch_current[0]);
+					if (catch_net.w < 0)
+					{
+						catch_net.x += catch_net.w;
+						catch_net.w *= -1;
+					}
+					if (catch_net.h < 0)
+					{
+						catch_net.y += catch_net.h;
+						catch_net.h *= -1;
+					}
+					fade_net = catch_net;
+					catchunits(catch_net);
 					catching = 0;
+					fade_net_alpha = selection_colour[3];
 				}
 			}
 			else if (e.type == SDL_MOUSEMOTION)
 			{
-				catch_current[0] = e.motion.x;
-				catch_current[1] = e.motion.y;
-				if (catch_current[1] > STATUSBAR_Y)
+				catch_net.w = e.motion.x-catch_net.x;
+				if (e.motion.y <= STATUSBAR_Y)
 				{
-					catch_current[1] = STATUSBAR_Y;
+					catch_net.h = e.motion.y-catch_net.y;
 				}
 			}
 		}
@@ -420,13 +462,17 @@ main(int argc, char **argv)
 		beings_draw();
 		if (catching)
 		{
-			SDL_Rect rect;
-			rect.x = catch_start[0];
-			rect.y = catch_start[1];
-			rect.w = catch_current[0]-catch_start[0];
-			rect.h = catch_current[1]-catch_start[1];
 			SDL_SetRenderDrawColor(renderer, selection_colour[0], selection_colour[1], selection_colour[2], selection_colour[3]);
-			SDL_RenderFillRect(renderer, &rect);
+			SDL_RenderFillRect(renderer, &catch_net);
+		}
+		else
+		{
+			SDL_SetRenderDrawColor(renderer, selection_colour[0], selection_colour[1], selection_colour[2], fade_net_alpha);
+			SDL_RenderFillRect(renderer, &fade_net);
+			if (fade_net_alpha-1 > 0)
+			{
+				fade_net_alpha = fade_net_alpha-1;
+			}
 		}
 		SDL_RenderPresent(renderer);
 	}
