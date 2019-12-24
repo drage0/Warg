@@ -9,6 +9,16 @@
 #include "lua.h"
 #include "utility.h"
 
+struct Being
+{
+	int x;
+	int y;
+	int w;
+	int h;
+};
+static struct Being beings[512];
+static int being_count;
+
 #define KEYBIND_SEQUENCE_MAX_LENGTH 256
 #define KEYBIND_MAX 64
 struct KeyBind
@@ -249,6 +259,19 @@ executesequence(lua_State *lstate, const char *command)
 }
 
 /*
+ * Set the being count initialize the array that's holding all beings.
+ */
+static void
+beings_spawn(void)
+{
+	being_count = 1;
+	beings[0].x = 44;
+	beings[0].y = 144;
+	beings[0].w = 16;
+	beings[0].h = 24;
+}
+
+/*
  * Draw the statusbar.
  */
 #define STATUSBAR_COLOUR 0xFF, 0x00, 0x00, 0xFF
@@ -264,6 +287,23 @@ statusbar_draw(void)
 	statusbar.h = STATUSBAR_H;
 	SDL_SetRenderDrawColor(renderer, STATUSBAR_COLOUR);
 	SDL_RenderFillRect(renderer, &statusbar);
+}
+
+#define BEING_COLOUR 0xFF, 0xFF, 0xFF, 0xFF
+static void
+beings_draw(void)
+{
+	int i;
+	for (i = 0; i < being_count; i++)
+	{
+		SDL_Rect beingrect;
+		beingrect.x = beings[i].x;
+		beingrect.y = beings[i].x;
+		beingrect.w = beings[i].w;
+		beingrect.h = beings[i].h;
+		SDL_SetRenderDrawColor(renderer, BEING_COLOUR);
+		SDL_RenderFillRect(renderer, &beingrect);
+	}
 }
 
 /*
@@ -316,6 +356,7 @@ main(int argc, char **argv)
 	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
 	catching = 0;
+	beings_spawn();
 	while(sys_running)
 	{
 		SDL_PumpEvents();
@@ -376,6 +417,7 @@ main(int argc, char **argv)
 		SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
 		SDL_RenderClear(renderer);
 		statusbar_draw();
+		beings_draw();
 		if (catching)
 		{
 			SDL_Rect rect;
