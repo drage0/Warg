@@ -428,7 +428,7 @@ main(int argc, char **argv)
 			}
 			else if (e.type == SDL_MOUSEBUTTONUP)
 			{
-				if (e.button.button == SDL_BUTTON_LEFT)
+				if (catching && e.button.button == SDL_BUTTON_LEFT)
 				{
 					if (catch_net.w < 0)
 					{
