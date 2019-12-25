@@ -5,6 +5,7 @@
 #
 MANAGARMR_MAKEDIR=./Managarmr
 SKOLL_MAKEDIR=./Skoll
+RUN_SCRIPT=./r
 
 all: lua program
 
@@ -18,4 +19,11 @@ clean:
 	cd $(MANAGARMR_MAKEDIR) && $(MAKE) clean
 	cd $(SKOLL_MAKEDIR)    && $(MAKE) clean
 
-.PHONY: lua program clean all
+install:
+	ln -sfr $(MANAGARMR_MAKEDIR)/out/managarmr $(RUN_SCRIPT)
+
+run:
+	$(RUN_SCRIPT)
+
+.PHONY: lua program clean all install run
+

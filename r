@@ -1,1 +1,0 @@
-./Managarmr/out/managarmr
