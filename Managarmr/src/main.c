@@ -259,7 +259,7 @@ executesequence(lua_State *lstate, const char *command)
 }
 
 /*
- * Set the being count initialize the array that's holding all beings.
+ * Set the being count and initialize the array that's holding all beings.
  */
 static void
 beings_spawn(void)
