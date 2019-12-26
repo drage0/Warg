@@ -476,6 +476,19 @@ main(int argc, char **argv)
 					catching = 0;
 					fade_net_alpha = selection_colour[3];
 				}
+        else if (e.button.button == SDL_BUTTON_RIGHT)
+        {
+          int mx, my, i;
+          SDL_GetMouseState(&mx, &my);
+          for (i = 0; i < 512; i++)
+          {
+            if (caughtunits[i])
+            {
+              beings[i].target.x = mx;
+              beings[i].target.y = my;
+            }
+          }
+        }
 			}
 			else if (e.type == SDL_MOUSEMOTION)
 			{
