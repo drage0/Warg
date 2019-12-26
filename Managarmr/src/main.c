@@ -22,7 +22,7 @@ struct Point2D
 struct Being
 {
 	struct Rect2D rect;
-  struct Point2D target;
+  struct Point2D target, base;
   int target_radius; /* The target destination is satisfied in this radius. */
 };
 static struct Being beings[512];
@@ -281,6 +281,8 @@ beings_spawn(void)
   beings[0].target_radius = 8;
   beings[0].target.x = 242;
   beings[0].target.y = 244;
+  beings[0].base.x = beings[0].rect.w/2;
+  beings[0].base.y = beings[0].rect.h;
 }
 
 /*
@@ -359,8 +361,8 @@ beings_act(void)
 	int i;
 	for (i = 0; i < being_count; i++)
 	{
-		float dx  = beings[i].target.x-beings[i].rect.x;
-		float dy  = beings[i].target.y-beings[i].rect.y;
+		float dx  = beings[i].target.x-(beings[i].rect.x+beings[i].base.x);
+		float dy  = beings[i].target.y-(beings[i].rect.y+beings[i].base.y);
     float len = sqrt(dx*dx+dy*dy);
     if (len > beings[i].target_radius)
     {
