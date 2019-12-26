@@ -9,12 +9,21 @@
 #include "lua.h"
 #include "utility.h"
 
+struct Rect2D
+{
+  float x, y, w, h;
+};
+
+struct Point2D
+{
+  int x, y;
+};
+
 struct Being
 {
-	int x;
-	int y;
-	int w;
-	int h;
+	struct Rect2D rect;
+  struct Point2D target;
+  int target_radius; /* The target destination is satisfied in this radius. */
 };
 static struct Being beings[512];
 static int being_count;
@@ -265,10 +274,13 @@ static void
 beings_spawn(void)
 {
 	being_count = 1;
-	beings[0].x = 44;
-	beings[0].y = 144;
-	beings[0].w = 16;
-	beings[0].h = 24;
+	beings[0].rect.x = 44;
+	beings[0].rect.y = 144;
+	beings[0].rect.w = 16;
+	beings[0].rect.h = 24;
+  beings[0].target_radius = 8;
+  beings[0].target.x = 242;
+  beings[0].target.y = 244;
 }
 
 /*
@@ -302,10 +314,10 @@ catchunits(SDL_Rect net)
 	for (i = 0; i < being_count; i++)
 	{
 		SDL_Rect br, intr;
-		br.x = beings[i].x;
-		br.y = beings[i].y;
-		br.w = beings[i].w;
-		br.h = beings[i].h;
+		br.x = (int) beings[i].rect.x;
+		br.y = (int) beings[i].rect.y;
+		br.w = (int) beings[i].rect.w;
+		br.h = (int) beings[i].rect.h;
 		if (SDL_IntersectRect(&net, &br, &intr))
 		{
 			printinfo("%s %d %d %d %d", "Caught.", intr.x, intr.y, intr.w, intr.h);
@@ -324,10 +336,10 @@ beings_draw(void)
 	for (i = 0; i < being_count; i++)
 	{
 		SDL_Rect beingrect;
-		beingrect.x = beings[i].x;
-		beingrect.y = beings[i].y;
-		beingrect.w = beings[i].w;
-		beingrect.h = beings[i].h;
+		beingrect.x = (int) beings[i].rect.x;
+		beingrect.y = (int) beings[i].rect.y;
+		beingrect.w = (int) beings[i].rect.w;
+		beingrect.h = (int) beings[i].rect.h;
 		SDL_SetRenderDrawColor(renderer, BEING_COLOUR);
 		SDL_RenderFillRect(renderer, &beingrect);
 		if (caughtunits[i])
@@ -338,6 +350,25 @@ beings_draw(void)
 			beingrect.h += 8;
 			SDL_RenderDrawRect(renderer, &beingrect);
 		}
+	}
+}
+
+static void
+beings_act(void)
+{
+	int i;
+	for (i = 0; i < being_count; i++)
+	{
+		float dx  = beings[i].target.x-beings[i].rect.x;
+		float dy  = beings[i].target.y-beings[i].rect.y;
+    float len = sqrt(dx*dx+dy*dy);
+    if (len > beings[i].target_radius)
+    {
+      dx = dx/len;
+      dy = dy/len;
+      beings[i].rect.x += dx;
+      beings[i].rect.y += dy;
+    }
 	}
 }
 
@@ -455,6 +486,8 @@ main(int argc, char **argv)
 				}
 			}
 		}
+    /* Update the world. */
+    beings_act();
 		/* Render the frame. */
 		SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
 		SDL_RenderClear(renderer);
