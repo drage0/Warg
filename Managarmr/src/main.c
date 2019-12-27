@@ -355,6 +355,23 @@ beings_draw(void)
 	}
 }
 
+#define BEING_TARGET_COLOUR 0xDA, 0x8A, 0x00, 0xFF
+static void
+beings_drawtarget(void)
+{
+	int i;
+	for (i = 0; i < being_count; i++)
+	{
+		SDL_Point start, end;
+		start.x = beings[i].rect.x+beings[i].base.x;
+		start.y = beings[i].rect.y+beings[i].base.y;
+		end.x   = beings[i].target.x;
+		end.y   = beings[i].target.y;
+		SDL_SetRenderDrawColor(renderer, BEING_TARGET_COLOUR);
+		SDL_RenderDrawLine(renderer, start.x, start.y, end.x, end.y);
+	}
+}
+
 static void
 beings_act(void)
 {
@@ -384,6 +401,7 @@ main(int argc, char **argv)
 	SDL_Rect fade_net;
 	int catching;
 	int fade_net_alpha;
+  int drawtargets;
 
 	welcomemessage();
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -421,6 +439,13 @@ main(int argc, char **argv)
 	beings_spawn();
 	while(sys_running)
 	{
+		const Uint8 *heldkeys;
+  	drawtargets = 0;
+		heldkeys = SDL_GetKeyboardState(NULL);
+		if (heldkeys[SDL_SCANCODE_SPACE])
+		{
+			drawtargets = 1;
+		}
 		SDL_PumpEvents();
 		while (SDL_PollEvent(&e))
 		{
@@ -508,6 +533,10 @@ main(int argc, char **argv)
 		SDL_RenderClear(renderer);
 		statusbar_draw();
 		beings_draw();
+		if (drawtargets)
+		{
+			beings_drawtarget();
+		}
 		if (catching)
 		{
 			SDL_SetRenderDrawColor(renderer, selection_colour[0], selection_colour[1], selection_colour[2], selection_colour[3]);
