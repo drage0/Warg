@@ -507,14 +507,17 @@ main(int argc, char **argv)
         {
           int mx, my, i;
           SDL_GetMouseState(&mx, &my);
-          for (i = 0; i < 512; i++)
-          {
-            if (caughtunits[i])
-            {
-              beings[i].target.x = mx;
-              beings[i].target.y = my;
-            }
-          }
+					if (my < STATUSBAR_Y)
+					{
+		        for (i = 0; i < 512; i++)
+		        {
+		          if (caughtunits[i])
+		          {
+		            beings[i].target.x = mx;
+		            beings[i].target.y = my;
+		          }
+		        }
+					}
         }
 			}
 			else if (e.type == SDL_MOUSEMOTION)
