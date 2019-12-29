@@ -9,21 +9,28 @@
 #include "lua.h"
 #include "utility.h"
 
-struct Rect2D
-{
-  float x, y, w, h;
-};
-
 struct Point2D
 {
-  int x, y;
+  float x, y;
+};
+
+struct Body
+{
+	struct Point2D position;
+	struct Point2D base;
+	struct Point2D size;
+};
+
+struct Brain
+{
+	struct Point2D target; /* Chasing target position. */
+	int target_radius;     /* The target destination is satisfied in this radius. */
 };
 
 struct Being
 {
-	struct Rect2D rect;
-	struct Point2D target, base;
-	int target_radius; /* The target destination is satisfied in this radius. */
+	struct Body body;
+	struct Brain brain;
 };
 static struct Being beings[512];
 static int being_count;
@@ -274,15 +281,15 @@ static void
 beings_spawn(void)
 {
 	being_count = 1;
-	beings[0].rect.x = 44;
-	beings[0].rect.y = 144;
-	beings[0].rect.w = 16;
-	beings[0].rect.h = 24;
-	beings[0].target_radius = 8;
-	beings[0].target.x = 242;
-	beings[0].target.y = 244;
-	beings[0].base.x = beings[0].rect.w/2;
-	beings[0].base.y = beings[0].rect.h;
+	beings[0].body.position.x = 44;
+	beings[0].body.position.y = 144;
+	beings[0].body.size.x = 16;
+	beings[0].body.size.y = 24;
+	beings[0].body.size.x = beings[0].body.size.x/2;
+	beings[0].body.size.y = beings[0].body.size.y/2;
+	beings[0].brain.target_radius = 8;
+	beings[0].brain.target.x = 242;
+	beings[0].brain.target.y = 244;
 }
 
 /*
@@ -316,10 +323,10 @@ catchunits(SDL_Rect net)
 	for (i = 0; i < being_count; i++)
 	{
 		SDL_Rect br, intr;
-		br.x = (int) beings[i].rect.x;
-		br.y = (int) beings[i].rect.y;
-		br.w = (int) beings[i].rect.w;
-		br.h = (int) beings[i].rect.h;
+		br.x = (int) beings[i].body.position.x;
+		br.y = (int) beings[i].body.position.y;
+		br.w = (int) beings[i].body.size.x;
+		br.h = (int) beings[i].body.size.y;
 		if (SDL_IntersectRect(&net, &br, &intr))
 		{
 			printinfo("%s %d %d %d %d", "Caught.", intr.x, intr.y, intr.w, intr.h);
@@ -337,20 +344,20 @@ beings_draw(void)
 	int i;
 	for (i = 0; i < being_count; i++)
 	{
-		SDL_Rect beingrect;
-		beingrect.x = (int) beings[i].rect.x;
-		beingrect.y = (int) beings[i].rect.y;
-		beingrect.w = (int) beings[i].rect.w;
-		beingrect.h = (int) beings[i].rect.h;
+		SDL_Rect br;
+		br.x = (int) beings[i].body.position.x;
+		br.y = (int) beings[i].body.position.y;
+		br.w = (int) beings[i].body.size.x;
+		br.h = (int) beings[i].body.size.y;
 		SDL_SetRenderDrawColor(renderer, BEING_COLOUR);
-		SDL_RenderFillRect(renderer, &beingrect);
+		SDL_RenderFillRect(renderer, &br);
 		if (caughtunits[i])
 		{
-			beingrect.x -= 4;
-			beingrect.y -= 4;
-			beingrect.w += 8;
-			beingrect.h += 8;
-			SDL_RenderDrawRect(renderer, &beingrect);
+			br.x -= 4;
+			br.y -= 4;
+			br.w += 8;
+			br.h += 8;
+			SDL_RenderDrawRect(renderer, &br);
 		}
 	}
 }
@@ -363,10 +370,10 @@ beings_drawtarget(void)
 	for (i = 0; i < being_count; i++)
 	{
 		SDL_Point start, end;
-		start.x = beings[i].rect.x+beings[i].base.x;
-		start.y = beings[i].rect.y+beings[i].base.y;
-		end.x   = beings[i].target.x;
-		end.y   = beings[i].target.y;
+		start.x = beings[i].body.position.x+beings[i].body.base.x;
+		start.y = beings[i].body.position.y+beings[i].body.base.y;
+		end.x   = beings[i].brain.target.x;
+		end.y   = beings[i].brain.target.y;
 		SDL_SetRenderDrawColor(renderer, BEING_TARGET_COLOUR);
 		SDL_RenderDrawLine(renderer, start.x, start.y, end.x, end.y);
 	}
@@ -378,15 +385,15 @@ beings_act(void)
 	int i;
 	for (i = 0; i < being_count; i++)
 	{
-		float dx  = beings[i].target.x-(beings[i].rect.x+beings[i].base.x);
-		float dy  = beings[i].target.y-(beings[i].rect.y+beings[i].base.y);
+		float dx  = beings[i].brain.target.x-(beings[i].body.position.x);
+		float dy  = beings[i].brain.target.y-(beings[i].body.position.y);
 		float len = sqrt(dx*dx+dy*dy);
-		if (len > beings[i].target_radius)
+		if (len > beings[i].brain.target_radius)
 		{
-		dx = dx/len;
-		dy = dy/len;
-		beings[i].rect.x += dx;
-		beings[i].rect.y += dy;
+			dx = dx/len;
+			dy = dy/len;
+			beings[i].body.position.x += dx;
+			beings[i].body.position.y += dy;
 		}
 	}
 }
@@ -507,17 +514,17 @@ main(int argc, char **argv)
 				{
 					int mx, my, i;
 					SDL_GetMouseState(&mx, &my);
-							if (my < STATUSBAR_Y)
-							{
+					if (my < STATUSBAR_Y)
+					{
 						for (i = 0; i < 512; i++)
 						{
 							if (caughtunits[i])
 							{
-							beings[i].target.x = mx;
-							beings[i].target.y = my;
+								beings[i].brain.target.x = mx;
+								beings[i].brain.target.y = my;
 							}
 						}
-							}
+					}
 				}
 			}
 			else if (e.type == SDL_MOUSEMOTION)
