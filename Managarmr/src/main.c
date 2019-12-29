@@ -6,34 +6,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <SDL2/SDL.h>
+#include "render.h"
 #include "lua.h"
 #include "utility.h"
-
-struct Point2D
-{
-  float x, y;
-};
-
-struct Body
-{
-	struct Point2D position;
-	struct Point2D base;
-	struct Point2D size;
-};
-
-struct Brain
-{
-	struct Point2D target; /* Chasing target position. */
-	int target_radius;     /* The target destination is satisfied in this radius. */
-};
-
-struct Being
-{
-	struct Body body;
-	struct Brain brain;
-};
-static struct Being beings[512];
-static int being_count;
+#include "being.h"
 
 #define KEYBIND_SEQUENCE_MAX_LENGTH 256
 #define KEYBIND_MAX 64
@@ -56,6 +32,8 @@ static int selection_colour[4] = {255, 0, 0, 255};
 
 static int interpreter_open = 0;
 static int sys_running = 1;
+static struct Being beings[BEING_MAX_COUNT];
+static int being_count;
 
 static void
 window_close(void)
@@ -336,68 +314,6 @@ catchunits(SDL_Rect net)
 	return;
 }
 
-#define BEING_COLOUR 0xFF, 0xFF, 0xFF, 0xFF
-#define COLOUR_BEINGCOORD 0xFF, 0x00, 0x00, 0xFF
-static void
-beings_draw(void)
-{
-	int i;
-	for (i = 0; i < being_count; i++)
-	{
-		SDL_Rect br;
-		br.x = (int) beings[i].body.position.x;
-		br.y = (int) beings[i].body.position.y;
-		br.w = (int) beings[i].body.size.x;
-		br.h = (int) beings[i].body.size.y;
-		SDL_SetRenderDrawColor(renderer, BEING_COLOUR);
-		SDL_RenderFillRect(renderer, &br);
-		if (caughtunits[i])
-		{
-			br.x -= 4;
-			br.y -= 4;
-			br.w += 8;
-			br.h += 8;
-			SDL_RenderDrawRect(renderer, &br);
-		}
-	}
-}
-
-#define BEING_TARGET_COLOUR 0xDA, 0x8A, 0x00, 0xFF
-static void
-beings_drawtarget(void)
-{
-	int i;
-	for (i = 0; i < being_count; i++)
-	{
-		SDL_Point start, end;
-		start.x = beings[i].body.position.x+beings[i].body.base.x;
-		start.y = beings[i].body.position.y+beings[i].body.base.y;
-		end.x   = beings[i].brain.target.x;
-		end.y   = beings[i].brain.target.y;
-		SDL_SetRenderDrawColor(renderer, BEING_TARGET_COLOUR);
-		SDL_RenderDrawLine(renderer, start.x, start.y, end.x, end.y);
-	}
-}
-
-static void
-beings_act(void)
-{
-	int i;
-	for (i = 0; i < being_count; i++)
-	{
-		float dx  = beings[i].brain.target.x-(beings[i].body.position.x);
-		float dy  = beings[i].brain.target.y-(beings[i].body.position.y);
-		float len = sqrt(dx*dx+dy*dy);
-		if (len > beings[i].brain.target_radius)
-		{
-			dx = dx/len;
-			dy = dy/len;
-			beings[i].body.position.x += dx;
-			beings[i].body.position.y += dy;
-		}
-	}
-}
-
 int
 main(int argc, char **argv)
 {
@@ -536,16 +452,18 @@ main(int argc, char **argv)
 				}
 			}
 		}
-		/* Update the world. */
-		beings_act();
-		/* Render the frame. */
+		/* Update and render the frame. */
 		SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
 		SDL_RenderClear(renderer);
 		statusbar_draw();
-		beings_draw();
-		if (drawtargets)
+		for (int i = 0; i < being_count; i++)
 		{
-			beings_drawtarget();
+			being_act(&beings[i]);
+			render_being(renderer, &beings[i], caughtunits[i]);
+			if(drawtargets)
+			{
+				render_beingtarget(renderer, &beings[i]);
+			}
 		}
 		if (catching)
 		{
