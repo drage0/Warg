@@ -285,8 +285,8 @@ beings_spawn(void)
 	beings[0].body.position.y = 144;
 	beings[0].body.size.x = 16;
 	beings[0].body.size.y = 24;
-	beings[0].body.size.x = beings[0].body.size.x/2;
-	beings[0].body.size.y = beings[0].body.size.y/2;
+	beings[0].body.base.x = beings[0].body.size.x/2;
+	beings[0].body.base.y = beings[0].body.size.y/2;
 	beings[0].brain.target_radius = 8;
 	beings[0].brain.target.x = 242;
 	beings[0].brain.target.y = 244;
