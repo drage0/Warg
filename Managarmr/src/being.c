@@ -16,3 +16,9 @@ being_act(struct Being *b)
 		b->body.position.y += d.y;
 	}
 }
+
+void being_settarget(struct Being *b, float x, float y)
+{
+	b->brain.target.x = x;
+	b->brain.target.y = y;
+}

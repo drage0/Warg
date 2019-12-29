@@ -29,3 +29,4 @@ struct Being
 };
 
 extern void being_act(struct Being *b);
+extern void being_settarget(struct Being *b, float x, float y);

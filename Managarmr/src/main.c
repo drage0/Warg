@@ -32,8 +32,6 @@ static int selection_colour[4] = {255, 0, 0, 255};
 
 static int interpreter_open = 0;
 static int sys_running = 1;
-static struct Being beings[BEING_MAX_COUNT];
-static int being_count;
 
 static void
 window_close(void)
@@ -256,18 +254,20 @@ executesequence(lua_State *lstate, const char *command)
  * Set the being count and initialize the array that's holding all beings.
  */
 static void
-beings_spawn(void)
+beings_spawn(struct Being **beings, int *being_count)
 {
-	being_count = 1;
-	beings[0].body.position.x = 44;
-	beings[0].body.position.y = 144;
-	beings[0].body.size.x = 16;
-	beings[0].body.size.y = 24;
-	beings[0].body.base.x = beings[0].body.size.x/2;
-	beings[0].body.base.y = beings[0].body.size.y/2;
-	beings[0].brain.target_radius = 8;
-	beings[0].brain.target.x = 242;
-	beings[0].brain.target.y = 244;
+	free(*beings);
+	*beings = malloc(BEING_MAX_COUNT*sizeof(struct Being));
+	*being_count = 1;
+	(*beings)[0].body.position.x = 44;
+	(*beings)[0].body.position.y = 144;
+	(*beings)[0].body.size.x = 16;
+	(*beings)[0].body.size.y = 24;
+	(*beings)[0].body.base.x = (*beings[0]).body.size.x/2;
+	(*beings)[0].body.base.y = (*beings[0]).body.size.y/2;
+	(*beings)[0].brain.target_radius = 8;
+	(*beings)[0].brain.target.x = 242;
+	(*beings)[0].brain.target.y = 244;
 }
 
 /*
@@ -293,7 +293,7 @@ statusbar_draw(void)
  */
 static int caughtunits[512];
 void
-catchunits(SDL_Rect net)
+catchunits(SDL_Rect net, struct Being *beings, int being_count)
 {
 	int i;
 	printinfo("net- %d %d %d %d", net.x, net.y, net.w, net.h);
@@ -322,6 +322,8 @@ main(int argc, char **argv)
 	lua_State *lstate;
 	SDL_Rect catch_net;
 	SDL_Rect fade_net;
+	struct Being *beings;
+	int being_count;
 	int catching;
 	int fade_net_alpha;
 	int drawtargets;
@@ -359,7 +361,8 @@ main(int argc, char **argv)
 
 	catching = 0;
 	fade_net_alpha = selection_colour[3];
-	beings_spawn();
+	beings = NULL;
+	beings_spawn(&beings, &being_count);
 	while(sys_running)
 	{
 		const Uint8 *heldkeys;
@@ -422,7 +425,7 @@ main(int argc, char **argv)
 						catch_net.h *= -1;
 					}
 					fade_net = catch_net;
-					catchunits(catch_net);
+					catchunits(catch_net, beings, being_count);
 					catching = 0;
 					fade_net_alpha = selection_colour[3];
 				}
@@ -436,8 +439,7 @@ main(int argc, char **argv)
 						{
 							if (caughtunits[i])
 							{
-								beings[i].brain.target.x = mx;
-								beings[i].brain.target.y = my;
+								being_settarget(&beings[i], mx, my);
 							}
 						}
 					}
