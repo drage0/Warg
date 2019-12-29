@@ -22,8 +22,8 @@ struct Point2D
 struct Being
 {
 	struct Rect2D rect;
-  struct Point2D target, base;
-  int target_radius; /* The target destination is satisfied in this radius. */
+	struct Point2D target, base;
+	int target_radius; /* The target destination is satisfied in this radius. */
 };
 static struct Being beings[512];
 static int being_count;
@@ -278,11 +278,11 @@ beings_spawn(void)
 	beings[0].rect.y = 144;
 	beings[0].rect.w = 16;
 	beings[0].rect.h = 24;
-  beings[0].target_radius = 8;
-  beings[0].target.x = 242;
-  beings[0].target.y = 244;
-  beings[0].base.x = beings[0].rect.w/2;
-  beings[0].base.y = beings[0].rect.h;
+	beings[0].target_radius = 8;
+	beings[0].target.x = 242;
+	beings[0].target.y = 244;
+	beings[0].base.x = beings[0].rect.w/2;
+	beings[0].base.y = beings[0].rect.h;
 }
 
 /*
@@ -380,14 +380,14 @@ beings_act(void)
 	{
 		float dx  = beings[i].target.x-(beings[i].rect.x+beings[i].base.x);
 		float dy  = beings[i].target.y-(beings[i].rect.y+beings[i].base.y);
-    float len = sqrt(dx*dx+dy*dy);
-    if (len > beings[i].target_radius)
-    {
-      dx = dx/len;
-      dy = dy/len;
-      beings[i].rect.x += dx;
-      beings[i].rect.y += dy;
-    }
+		float len = sqrt(dx*dx+dy*dy);
+		if (len > beings[i].target_radius)
+		{
+		dx = dx/len;
+		dy = dy/len;
+		beings[i].rect.x += dx;
+		beings[i].rect.y += dy;
+		}
 	}
 }
 
@@ -401,7 +401,7 @@ main(int argc, char **argv)
 	SDL_Rect fade_net;
 	int catching;
 	int fade_net_alpha;
-  int drawtargets;
+	int drawtargets;
 
 	welcomemessage();
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -440,7 +440,7 @@ main(int argc, char **argv)
 	while(sys_running)
 	{
 		const Uint8 *heldkeys;
-  	drawtargets = 0;
+		drawtargets = 0;
 		heldkeys = SDL_GetKeyboardState(NULL);
 		if (heldkeys[SDL_SCANCODE_SPACE])
 		{
@@ -503,22 +503,22 @@ main(int argc, char **argv)
 					catching = 0;
 					fade_net_alpha = selection_colour[3];
 				}
-        else if (e.button.button == SDL_BUTTON_RIGHT)
-        {
-          int mx, my, i;
-          SDL_GetMouseState(&mx, &my);
-					if (my < STATUSBAR_Y)
-					{
-		        for (i = 0; i < 512; i++)
-		        {
-		          if (caughtunits[i])
-		          {
-		            beings[i].target.x = mx;
-		            beings[i].target.y = my;
-		          }
-		        }
-					}
-        }
+				else if (e.button.button == SDL_BUTTON_RIGHT)
+				{
+					int mx, my, i;
+					SDL_GetMouseState(&mx, &my);
+							if (my < STATUSBAR_Y)
+							{
+						for (i = 0; i < 512; i++)
+						{
+							if (caughtunits[i])
+							{
+							beings[i].target.x = mx;
+							beings[i].target.y = my;
+							}
+						}
+							}
+				}
 			}
 			else if (e.type == SDL_MOUSEMOTION)
 			{
@@ -529,8 +529,8 @@ main(int argc, char **argv)
 				}
 			}
 		}
-    /* Update the world. */
-    beings_act();
+		/* Update the world. */
+		beings_act();
 		/* Render the frame. */
 		SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
 		SDL_RenderClear(renderer);
