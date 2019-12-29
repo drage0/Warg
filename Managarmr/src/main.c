@@ -252,6 +252,7 @@ executesequence(lua_State *lstate, const char *command)
 
 /*
  * Set the being count and initialize the array that's holding all beings.
+ * BEING_MAX_COUNT is defined in `being.h`.
  */
 static void
 beings_spawn(struct Being **beings, int *being_count)
