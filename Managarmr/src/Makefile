@@ -14,7 +14,7 @@ LIBS=-L$(SKOLL_DIR) -llua -lSDL2 -lm -ldl
 
 all: $(BUILD_DIR)/main.o $(BUILD_DIR)/being.o $(BUILD_DIR)/render.o $(OUTPUT_DIR)/managarmr
 
-$(OUTPUT_DIR)/managarmr: $(BUILD_DIR)/main.o
+$(OUTPUT_DIR)/managarmr: $(BUILD_DIR)/main.o $(BUILD_DIR)/being.o $(BUILD_DIR)/render.o
 	$(CC) $(BUILD_DIR)/main.o $(BUILD_DIR)/being.o $(BUILD_DIR)/render.o -o $(OUTPUT_DIR)/managarmr $(LIBS)
 
 $(BUILD_DIR)/main.o: main.c lua.h utility.h
