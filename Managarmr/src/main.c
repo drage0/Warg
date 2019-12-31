@@ -15,33 +15,30 @@
 #define KEYBIND_MAX 64
 struct KeyBind
 {
-	SDL_Keycode key;
-	char sequence[KEYBIND_SEQUENCE_MAX_LENGTH];
+	SDL_Keycode key;                                            /* The key code of the bound key. */
+	char sequence[KEYBIND_SEQUENCE_MAX_LENGTH];                 /* Lua script to be executed. */
 };
 
-/* Window */
-#define WINDOW_TITLE_MAX 64
-static SDL_Window *window;
-static SDL_Renderer *renderer;
-static int window_width  = 800;
-static int window_height = 600;
-static int window_vsync  = 1;
-static char window_title[WINDOW_TITLE_MAX] = "~mánagarmr";
-
 /* Keybinds */
-static struct KeyBind keybinds[KEYBIND_MAX];
-static unsigned int keybind_count = 0;
+static struct KeyBind keybinds[KEYBIND_MAX];                    /* All keys bound with Lua script(s). */
+static unsigned int keybind_count = 0;                          /* The amount of bound keys. */
 
-/* Preferences */
-static int selection_colour[4] = {255, 0, 0, 255};
-
-/* System variables */
-static int interpreter_open = 0;
-static int sys_running = 1;
+/* Window system */
+#define WINDOW_TITLE_MAX 64
+static SDL_Window *window;                                      /* The window. */
+static SDL_Renderer *renderer;                                  /* The renderer. */
 
 /* Variables bound with lua script */
-typedef int intbound;
-static intbound scene_drawtargets; 
+typedef int  intbound;                                          /* integer value that can also be changed in a Lua script. */
+typedef char charbound;                                         /* char value that can also be changed in a Lua script. */
+static intbound selection_colour[4] = {255, 0, 0, 255};         /* The colour of the selection rectangle. */
+static intbound interpreter_open = 0;                           /* Is the Lua interpreter open? */
+static intbound sys_running = 1;                                /* Should the main loop still be running? */
+static intbound scene_drawtargets;                              /* Draw the beings' target destination. */
+static int window_width  = 800;                                 /* Window width. */
+static int window_height = 600;                                 /* Window height. */
+static int window_vsync  = 1;                                   /* Window vertical synchronisation. */
+static charbound window_title[WINDOW_TITLE_MAX] = "~mánagarmr"; /* Window caption (title). */
 
 static void
 window_close(void)
