@@ -19,6 +19,7 @@ struct KeyBind
 	char sequence[KEYBIND_SEQUENCE_MAX_LENGTH];
 };
 
+/* Window */
 #define WINDOW_TITLE_MAX 64
 static SDL_Window *window;
 static SDL_Renderer *renderer;
@@ -26,10 +27,15 @@ static int window_width  = 800;
 static int window_height = 600;
 static int window_vsync  = 1;
 static char window_title[WINDOW_TITLE_MAX] = "~mánagarmr";
+
+/* Keybinds */
 static struct KeyBind keybinds[KEYBIND_MAX];
 static unsigned int keybind_count = 0;
+
+/* Preferences */
 static int selection_colour[4] = {255, 0, 0, 255};
 
+/* System variables */
 static int interpreter_open = 0;
 static int sys_running = 1;
 
@@ -43,6 +49,7 @@ window_close(void)
 inline static void
 sys_exit(void)
 {
+	printinfo("%s", "Called sys_exit.");
 	sys_running = 0;
 }
 
@@ -88,10 +95,16 @@ lua_system_bind(lua_State *lstate)
 	return 0;
 }
 
+/*
+ * Call sys_exit() and lua_interpreter_close().
+ * Effectively setting the variable to exit the program and close the
+ * interpreter.
+ */
 static int
 lua_system_exit(lua_State *lstate)
 {
 	sys_exit();
+	lua_interpreter_close(lstate);
 	return 0;
 }
 
