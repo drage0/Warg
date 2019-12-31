@@ -19,3 +19,4 @@ selection_colour = {0, 255, 0, 42};
 --]]
 bind('f10', "exit()");
 bind('w', "close()");
+bind('space', "toggletargets()");

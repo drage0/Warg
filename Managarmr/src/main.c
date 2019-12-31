@@ -39,6 +39,10 @@ static int selection_colour[4] = {255, 0, 0, 255};
 static int interpreter_open = 0;
 static int sys_running = 1;
 
+/* Variables bound with lua script */
+typedef int intbound;
+static intbound scene_drawtargets; 
+
 static void
 window_close(void)
 {
@@ -51,6 +55,12 @@ sys_exit(void)
 {
 	printinfo("%s", "Called sys_exit.");
 	sys_running = 0;
+}
+
+inline static void
+scene_toggletargets(void)
+{
+	scene_drawtargets = 1-scene_drawtargets;
 }
 
 /*
@@ -92,6 +102,16 @@ lua_system_bind(lua_State *lstate)
 	/* Copy the created structure. */
 	memcpy(&keybinds[keybind_count], &bind, sizeof(struct KeyBind));
 	keybind_count += 1;
+	return 0;
+}
+
+/*
+ * Lua functions - scene.
+ */
+static int
+lua_scene_toggletargets(lua_State *lstate)
+{
+	scene_toggletargets();
 	return 0;
 }
 
@@ -340,7 +360,6 @@ main(int argc, char **argv)
 	int being_count;
 	int catching;
 	int fade_net_alpha;
-	int drawtargets;
 
 	welcomemessage();
 	SDL_Init(SDL_INIT_EVERYTHING);
@@ -356,6 +375,8 @@ main(int argc, char **argv)
 	lua_setglobal(lstate, "exit");
 	lua_pushcfunction(lstate, lua_system_exit);
 	lua_setglobal(lstate, "quit");
+	lua_pushcfunction(lstate, lua_scene_toggletargets);
+	lua_setglobal(lstate, "toggletargets");
 
 	/* Execute the configuration script. */
 	executescript(lstate, "./data/scripts/configuration.lua");
@@ -380,12 +401,7 @@ main(int argc, char **argv)
 	while(sys_running)
 	{
 		const Uint8 *heldkeys;
-		drawtargets = 0;
 		heldkeys = SDL_GetKeyboardState(NULL);
-		if (heldkeys[SDL_SCANCODE_SPACE])
-		{
-			drawtargets = 1;
-		}
 		SDL_PumpEvents();
 		while (SDL_PollEvent(&e))
 		{
@@ -476,7 +492,7 @@ main(int argc, char **argv)
 		{
 			being_act(&beings[i]);
 			render_being(renderer, &beings[i], caughtunits[i]);
-			if(drawtargets)
+			if(scene_drawtargets)
 			{
 				render_beingtarget(renderer, &beings[i]);
 			}
