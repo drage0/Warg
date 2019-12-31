@@ -21,7 +21,7 @@ $(BUILD_DIR)/main.o: main.c lua.h utility.h
 	$(CC) $(CFLAGS) -c main.c -o $(BUILD_DIR)/main.o
 $(BUILD_DIR)/being.o: being.c being.h utility.h
 	$(CC) $(CFLAGS) -c being.c -o $(BUILD_DIR)/being.o
-$(BUILD_DIR)/render.o: render.h utility.h being.h
+$(BUILD_DIR)/render.o: render.c render.h utility.h being.h
 	$(CC) $(CFLAGS) -c render.c -o $(BUILD_DIR)/render.o
 
 clean:
