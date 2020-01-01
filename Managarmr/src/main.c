@@ -489,7 +489,7 @@ main(int argc, char **argv)
 		{
 			being_act(&beings[i]);
 			render_being(renderer, &beings[i], caughtunits[i]);
-			if(scene_drawtargets)
+			if(scene_drawtargets && !being_reachedtarget(&beings[i]))
 			{
 				render_beingtarget(renderer, &beings[i]);
 			}
