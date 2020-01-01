@@ -4,12 +4,12 @@
 # 1. 12. 2019.
 #
 CC=clang
-CFLAGS=-g
+CFLAGS=-g $(shell sdl2-config --cflags)
 
 SKOLL_DIR=../../Skoll/out
 OUTPUT_DIR=../out
 BUILD_DIR=../build
-LIBS=-L$(SKOLL_DIR) -llua -lSDL2 -lm -ldl
+LIBS=-L$(SKOLL_DIR) -llua $(shell sdl2-config --libs) -lm -ldl
 
 
 all: $(BUILD_DIR)/main.o $(BUILD_DIR)/being.o $(BUILD_DIR)/render.o $(OUTPUT_DIR)/managarmr
