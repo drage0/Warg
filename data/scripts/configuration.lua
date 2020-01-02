@@ -12,11 +12,11 @@ window =
 	vsync  = 1
 }
 
-selection_colour = {0, 255, 0, 42};
+selection_colour = {0, 255, 0, 42}
 
 --[[
 -- Keybind examples
 --]]
-bind('f10', "exit()");
-bind('w', "close()");
-bind('space', "toggletargets()");
+bind('f10', "exit()")
+bind('w', "close()")
+bind('space', "toggletargets()")
