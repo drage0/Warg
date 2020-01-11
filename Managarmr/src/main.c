@@ -13,32 +13,44 @@
 
 #define KEYBIND_SEQUENCE_MAX_LENGTH 256
 #define KEYBIND_MAX 64
+/*
+ * Structure holding the key and its assosiated command.
+ * key- the key code of the bound key.
+ * sequence- Lua script to be executed (given as a string.)
+ */
 struct KeyBind
 {
-	SDL_Keycode key;                                            /* The key code of the bound key. */
-	char sequence[KEYBIND_SEQUENCE_MAX_LENGTH];                 /* Lua script to be executed. */
+	SDL_Keycode key;
+	char sequence[KEYBIND_SEQUENCE_MAX_LENGTH];
 };
-
-/* Keybinds */
-static struct KeyBind keybinds[KEYBIND_MAX];                    /* All keys bound with Lua script(s). */
-static unsigned int keybind_count = 0;                          /* The amount of bound keys. */
+static struct KeyBind keybinds[KEYBIND_MAX];
+static unsigned int keybind_count = 0;
 
 /* Window system */
 #define WINDOW_TITLE_MAX 64
-static SDL_Window *window;                                      /* The window. */
-static SDL_Renderer *renderer;                                  /* The renderer. */
+static SDL_Window *window;
+static SDL_Renderer *renderer;
 
-/* Variables bound with lua script */
-typedef int  intbound;                                          /* integer value that can also be changed in a Lua script. */
-typedef char charbound;                                         /* char value that can also be changed in a Lua script. */
-static intbound selection_colour[4] = {255, 0, 0, 255};         /* The colour of the selection rectangle. */
-static intbound interpreter_open = 0;                           /* Is the Lua interpreter open? */
-static intbound sys_running = 1;                                /* Should the main loop still be running? */
-static intbound scene_drawtargets;                              /* Draw the beings' target destination. */
-static int window_width  = 800;                                 /* Window width. */
-static int window_height = 600;                                 /* Window height. */
-static int window_vsync  = 1;                                   /* Window vertical synchronisation. */
-static charbound window_title[WINDOW_TITLE_MAX] = "~mánagarmr"; /* Window caption (title). */
+/*
+ * Variables bound with lua script(s).
+ * selection_coour- the colour of the selection rectangle.
+ * interpreter_open- is the lua interpreter open?
+ * sys_running- should the main loop still be running?
+ * scene_drawtargets- draw the beings' target destination.
+ * window_width- window's width.
+ * window_height- window's height.
+ * window_title- the title of the window (caption).
+ */
+typedef int  intbound;
+typedef char charbound;
+static intbound selection_colour[4] = {255, 0, 0, 255};
+static intbound interpreter_open = 0;
+static intbound sys_running = 1;
+static intbound scene_drawtargets;
+static int window_width  = 800;
+static int window_height = 600;
+static int window_vsync  = 1;
+static charbound window_title[WINDOW_TITLE_MAX] = "~mánagarmr";
 
 static void
 window_close(void)
@@ -78,14 +90,6 @@ lua_system_bind(lua_State *lstate)
 {
 	struct KeyBind bind;
 	const char *key, *sequence;
-	/*
-	lua_CFunction function;
-	key      = lua_tostring(lstate, -2);
-	function = lua_tocfunction(lstate, -1);
-	printf("Binding %-6s to %p.\n", key, function);
-	lua_pop(lstate, 2);
-	function(lstate);
-	*/
 	key      = lua_tostring(lstate, -2);
 	sequence = lua_tostring(lstate, -1);
 	printinfo("Binding %-6s to \"%s\".", key, sequence);
