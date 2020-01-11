@@ -17,13 +17,15 @@ being_act(struct Being *b)
 	}
 }
 
-void being_settarget(struct Being *b, float x, float y)
+void
+being_settarget(struct Being *b, float x, float y)
 {
 	b->brain.target.x = x;
 	b->brain.target.y = y;
 }
 
-int being_reachedtarget(const struct Being * restrict b)
+int
+being_reachedtarget(const struct Being * restrict b)
 {
 	struct Point2D d;
 	d.x = b->brain.target.x-(b->body.position.x+b->body.base.x);
