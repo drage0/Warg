@@ -51,4 +51,7 @@ extern void being_act(struct Being *b);
 extern void being_settarget(struct Being *b, float x, float y, float radius);
 extern int  being_reachedtarget(const struct Being * restrict b);
 extern int  being_hasflag(const struct Being * restrict b, const beingflag flag);
+extern void being_toggleflag(struct Being * restrict b, const beingflag flag);
+extern void being_setflag   (struct Being * restrict b, const beingflag flag);
+extern void being_clearflag (struct Being * restrict b, const beingflag flag);
 extern struct Being being_create(const struct BeingCreateInfo info);

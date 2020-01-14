@@ -41,6 +41,24 @@ being_hasflag(const struct Being * restrict b, const beingflag flag)
 	return (b->brain.flags & flag);
 }
 
+void
+being_toggleflag(struct Being * restrict b, const beingflag flag)
+{
+	b->brain.flags ^= flag;
+}
+
+void
+being_setflag(struct Being * restrict b, const beingflag flag)
+{
+	b->brain.flags |= flag;
+}
+
+void
+being_clearflag(struct Being * restrict b, const beingflag flag)
+{
+	b->brain.flags &= ~flag;
+}
+
 struct Being being_create(const struct BeingCreateInfo info)
 {
 	struct Being being;
