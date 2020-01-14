@@ -291,18 +291,17 @@ executesequence(lua_State *lstate, const char *command)
 static void
 beings_spawn(struct Being **beings, int *being_count)
 {
+	struct BeingCreateInfo info;
 	free(*beings);
-	*beings = malloc(BEING_MAX_COUNT*sizeof(struct Being));
+	*beings      = malloc(BEING_MAX_COUNT*sizeof(struct Being));
 	*being_count = 1;
-	(*beings)[0].body.position.x = 44;
-	(*beings)[0].body.position.y = 144;
-	(*beings)[0].body.size.x = 16;
-	(*beings)[0].body.size.y = 24;
-	(*beings)[0].body.base.x = (*beings[0]).body.size.x/2;
-	(*beings)[0].body.base.y = (*beings[0]).body.size.y/2;
-	(*beings)[0].brain.target_radius = 8;
-	(*beings)[0].brain.target.x = 242;
-	(*beings)[0].brain.target.y = 244;
+	/* Prepare the info and create new beings. */
+	info.position.x = 44;
+	info.position.y = 144;
+	info.size.x     = 16;
+	info.size.y     = 24;
+	info.alignment  = BEING_ALIGNMENT_BLU;
+	(*beings)[0] = being_create(info);
 }
 
 /*
@@ -470,7 +469,7 @@ main(int argc, char **argv)
 						{
 							if (caughtunits[i])
 							{
-								being_settarget(&beings[i], mx, my);
+								being_settarget(&beings[i], mx, my, BEING_TARGETRADIUS_MOVEMENT);
 							}
 						}
 					}

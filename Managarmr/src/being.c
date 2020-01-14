@@ -18,10 +18,11 @@ being_act(struct Being *b)
 }
 
 void
-being_settarget(struct Being *b, float x, float y)
+being_settarget(struct Being *b, float x, float y, float radius)
 {
-	b->brain.target.x = x;
-	b->brain.target.y = y;
+	b->brain.target.x      = x;
+	b->brain.target.y      = y;
+	b->brain.target_radius = radius;
 }
 
 int
@@ -32,4 +33,17 @@ being_reachedtarget(const struct Being * restrict b)
 	d.y = b->brain.target.y-(b->body.position.y+b->body.base.y);
 	float len = sqrt(d.x*d.x+d.y*d.y);
 	return (len <= b->brain.target_radius);
+}
+
+struct Being being_create(const struct BeingCreateInfo info)
+{
+	struct Being being;
+	being.body.position       = info.position;
+	being.body.size           = info.size;
+	being.body.base.x         = being.body.size.x/2;
+	being.body.base.y         = being.body.size.y/2;
+	being.brain.target_radius = BEING_TARGETRADIUS_MOVEMENT;
+	being.brain.target        = info.position;
+	being.brain.alignment     = info.alignment;
+	return being;
 }
