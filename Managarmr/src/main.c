@@ -288,20 +288,21 @@ executesequence(lua_State *lstate, const char *command)
  * Set the being count and initialize the array that's holding all beings.
  * BEING_MAX_COUNT is defined in `being.h`.
  */
+static struct Being beings[BEING_MAX_COUNT];
+static int caughtunits[BEING_MAX_COUNT];
+static int being_count;
 static void
-beings_spawn(struct Being **beings, int *being_count)
+beings_spawn(void)
 {
 	struct BeingCreateInfo info;
-	free(*beings);
-	*beings      = malloc(BEING_MAX_COUNT*sizeof(struct Being));
-	*being_count = 1;
+	being_count = 1;
 	/* Prepare the info and create new beings. */
 	info.position.x = 44;
 	info.position.y = 144;
 	info.size.x     = 16;
 	info.size.y     = 24;
 	info.alignment  = BEING_ALIGNMENT_BLU;
-	(*beings)[0] = being_create(info);
+	beings[0] = being_create(info);
 }
 
 /*
@@ -325,7 +326,6 @@ statusbar_draw(void)
 /*
  * TODO /ideas/
  */
-static int caughtunits[512];
 void
 catchunits(SDL_Rect net, struct Being *beings, int being_count)
 {
@@ -356,8 +356,6 @@ main(int argc, char **argv)
 	lua_State *lstate;
 	SDL_Rect catch_net;
 	SDL_Rect fade_net;
-	struct Being *beings;
-	int being_count;
 	int catching;
 	int fade_net_alpha;
 
@@ -396,8 +394,7 @@ main(int argc, char **argv)
 
 	catching = 0;
 	fade_net_alpha = selection_colour[3];
-	beings = NULL;
-	beings_spawn(&beings, &being_count);
+	beings_spawn();
 	while(sys_running)
 	{
 		const Uint8 *heldkeys;
