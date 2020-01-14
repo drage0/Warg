@@ -289,7 +289,6 @@ executesequence(lua_State *lstate, const char *command)
  * BEING_MAX_COUNT is defined in `being.h`.
  */
 static struct Being beings[BEING_MAX_COUNT];
-static int caughtunits[BEING_MAX_COUNT];
 static int being_count;
 static void
 beings_spawn(void)
@@ -331,7 +330,6 @@ catchunits(SDL_Rect net, struct Being *beings, int being_count)
 {
 	int i;
 	printinfo("net- %d %d %d %d", net.x, net.y, net.w, net.h);
-	memset(caughtunits, 0, sizeof(caughtunits));
 	for (i = 0; i < being_count; i++)
 	{
 		SDL_Rect br, intr;
@@ -342,7 +340,11 @@ catchunits(SDL_Rect net, struct Being *beings, int being_count)
 		if (SDL_IntersectRect(&net, &br, &intr))
 		{
 			printinfo("%s %d %d %d %d", "Caught.", intr.x, intr.y, intr.w, intr.h);
-			caughtunits[i] = 1;
+			being_setflag(&beings[i], BEING_FLAG_SELECTED);
+		}
+		else
+		{
+			being_clearflag(&beings[i], BEING_FLAG_SELECTED);
 		}
 	}
 	return;
@@ -464,7 +466,7 @@ main(int argc, char **argv)
 					{
 						for (i = 0; i < 512; i++)
 						{
-							if (caughtunits[i])
+							if (being_hasflag(&beings[i], BEING_FLAG_SELECTED))
 							{
 								being_settarget(&beings[i], mx, my, BEING_TARGETRADIUS_MOVEMENT);
 							}
@@ -488,7 +490,7 @@ main(int argc, char **argv)
 		for (int i = 0; i < being_count; i++)
 		{
 			being_act(&beings[i]);
-			render_being(renderer, &beings[i], caughtunits[i]);
+			render_being(renderer, &beings[i], being_hasflag(&beings[i], BEING_FLAG_SELECTED));
 			if(scene_drawtargets && !being_reachedtarget(&beings[i]))
 			{
 				render_beingtarget(renderer, &beings[i]);
