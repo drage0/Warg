@@ -35,6 +35,12 @@ being_reachedtarget(const struct Being * restrict b)
 	return (len <= b->brain.target_radius);
 }
 
+int
+being_hasflag(const struct Being * restrict b, const beingflag flag)
+{
+	return (b->brain.flags & flag);
+}
+
 struct Being being_create(const struct BeingCreateInfo info)
 {
 	struct Being being;
@@ -45,5 +51,6 @@ struct Being being_create(const struct BeingCreateInfo info)
 	being.brain.target_radius = BEING_TARGETRADIUS_MOVEMENT;
 	being.brain.target        = info.position;
 	being.brain.alignment     = info.alignment;
+	being.brain.flags         = BEING_FLAG_NONE;
 	return being;
 }
