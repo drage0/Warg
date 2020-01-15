@@ -18,11 +18,11 @@ being_act(struct Being *b)
 }
 
 void
-being_setmovetarget(struct Being *b, float x, float y)
+being_setmovetarget(struct Being *b, float x, float y, float radius)
 {
 	b->brain.target.x      = x;
 	b->brain.target.y      = y;
-	b->brain.target_radius = BEING_TARGETRADIUS_MOVEMENT;
+	b->brain.target_radius = radius;
 }
 
 int
@@ -66,6 +66,7 @@ struct Being being_create(const struct BeingCreateInfo info)
 	being.body.size           = info.size;
 	being.body.base.x         = being.body.size.x/2;
 	being.body.base.y         = being.body.size.y/2;
+	being.body.radius         = info.radius;
 	being.brain.target_radius = BEING_TARGETRADIUS_MOVEMENT;
 	being.brain.target        = info.position;
 	being.brain.alignment     = info.alignment;

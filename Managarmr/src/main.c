@@ -294,14 +294,24 @@ static void
 beings_spawn(void)
 {
 	struct BeingCreateInfo info;
-	being_count = 1;
+	being_count = 4;
 	/* Prepare the info and create new beings. */
 	info.position.x = 44;
 	info.position.y = 144;
 	info.size.x     = 16;
 	info.size.y     = 24;
+	info.radius     = 16.0f;
 	info.alignment  = BEING_ALIGNMENT_BLU;
 	beings[0] = being_create(info);
+	info.position.x = 44;
+	info.position.y = 200;
+	beings[1] = being_create(info);
+	info.position.x = 24;
+	info.position.y = 188;
+	beings[2] = being_create(info);
+	info.position.x = 54;
+	info.position.y = 388;
+	beings[3] = being_create(info);
 }
 
 /*
@@ -328,11 +338,15 @@ statusbar_draw(void)
 static void
 unit_selectedcommandmove(int targetx, int targety)
 {
+	float radius = BEING_TARGETRADIUS_MOVEMENT;
+	int numberselected = 0;
 	for (int i = 0; i < being_count; i++)
 	{
 		if (being_hasflag(&beings[i], BEING_FLAG_SELECTED))
 		{
-			being_setmovetarget(&beings[i], targetx, targety);
+			being_setmovetarget(&beings[i], targetx, targety, radius);
+			radius         = radius+beings[i].body.radius;
+			numberselected = numberselected+1;
 		}
 	}
 }
