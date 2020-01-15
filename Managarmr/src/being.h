@@ -5,7 +5,7 @@
 #define BEING_TARGET_COLOUR 0xDA, 0x8A, 0x00, 0xFF
 #define BEING_ALIGNMENT_BLU 1
 #define BEING_ALIGNMENT_RED 2
-#define BEING_TARGETRADIUS_MOVEMENT 2.0f
+#define BEING_TARGETRADIUS_MOVEMENT 2.0f /* Implied target radius in being_setmovetarget */
 #define BEING_FLAG_NONE 0
 #define BEING_FLAG_SELECTED (1<<0)
 
@@ -48,7 +48,7 @@ struct BeingCreateInfo
 };
 
 extern void being_act(struct Being *b);
-extern void being_settarget(struct Being *b, float x, float y, float radius);
+extern void being_setmovetarget(struct Being *b, float x, float y);
 extern int  being_reachedtarget(const struct Being * restrict b);
 extern int  being_hasflag(const struct Being * restrict b, const beingflag flag);
 extern void being_toggleflag(struct Being * restrict b, const beingflag flag);

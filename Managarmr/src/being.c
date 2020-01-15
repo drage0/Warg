@@ -18,11 +18,11 @@ being_act(struct Being *b)
 }
 
 void
-being_settarget(struct Being *b, float x, float y, float radius)
+being_setmovetarget(struct Being *b, float x, float y)
 {
 	b->brain.target.x      = x;
 	b->brain.target.y      = y;
-	b->brain.target_radius = radius;
+	b->brain.target_radius = BEING_TARGETRADIUS_MOVEMENT;
 }
 
 int

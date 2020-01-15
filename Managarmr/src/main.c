@@ -323,6 +323,21 @@ statusbar_draw(void)
 }
 
 /*
+ * Set a new movement target to all selected units.
+ */
+static void
+unit_selectedcommandmove(int targetx, int targety)
+{
+	for (int i = 0; i < being_count; i++)
+	{
+		if (being_hasflag(&beings[i], BEING_FLAG_SELECTED))
+		{
+			being_setmovetarget(&beings[i], targetx, targety);
+		}
+	}
+}
+
+/*
  * TODO /ideas/
  */
 void
@@ -464,13 +479,7 @@ main(int argc, char **argv)
 					SDL_GetMouseState(&mx, &my);
 					if (my < STATUSBAR_Y)
 					{
-						for (i = 0; i < 512; i++)
-						{
-							if (being_hasflag(&beings[i], BEING_FLAG_SELECTED))
-							{
-								being_settarget(&beings[i], mx, my, BEING_TARGETRADIUS_MOVEMENT);
-							}
-						}
+						unit_selectedcommandmove(mx, my);
 					}
 				}
 			}
