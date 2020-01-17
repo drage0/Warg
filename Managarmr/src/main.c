@@ -518,7 +518,6 @@ main(int argc, char **argv)
 		/* Update and render the frame. */
 		SDL_SetRenderDrawColor(renderer, 0x00, 0x00, 0x00, 0xFF);
 		SDL_RenderClear(renderer);
-		statusbar_draw();
 		for (int i = 0; i < being_count; i++)
 		{
 			being_act(&beings[i]);
@@ -542,6 +541,7 @@ main(int argc, char **argv)
 				fade_net_alpha = fade_net_alpha-1;
 			}
 		}
+		statusbar_draw();
 		SDL_RenderPresent(renderer);
 	}
 
