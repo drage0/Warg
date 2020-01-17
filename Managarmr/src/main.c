@@ -354,10 +354,12 @@ unit_selectedcommandmove(int targetx, int targety)
 /*
  * TODO /ideas/
  */
+#define SELECTION_NET_AREA_MULTIPLE_THRESHOLD 10
 void
 catchunits(SDL_Rect net, struct Being *beings, int being_count)
 {
-	int i;
+	int i, cancatch = 1;
+	const int onlyone = (net.w*net.w+net.h+net.h < SELECTION_NET_AREA_MULTIPLE_THRESHOLD);
 	printinfo("net- %d %d %d %d", net.x, net.y, net.w, net.h);
 	for (i = 0; i < being_count; i++)
 	{
@@ -366,10 +368,11 @@ catchunits(SDL_Rect net, struct Being *beings, int being_count)
 		br.y = (int) beings[i].body.position.y;
 		br.w = (int) beings[i].body.size.x;
 		br.h = (int) beings[i].body.size.y;
-		if (SDL_IntersectRect(&net, &br, &intr))
+		if (cancatch && SDL_IntersectRect(&net, &br, &intr))
 		{
 			printinfo("%s %d %d %d %d", "Caught.", intr.x, intr.y, intr.w, intr.h);
 			being_setflag(&beings[i], BEING_FLAG_SELECTED);
+			cancatch = (onlyone ? 0 : 1);
 		}
 		else
 		{
@@ -477,10 +480,18 @@ main(int argc, char **argv)
 						catch_net.x += catch_net.w;
 						catch_net.w *= -1;
 					}
+					else if (catch_net.w == 0)
+					{
+						catch_net.w = 1;
+					}
 					if (catch_net.h < 0)
 					{
 						catch_net.y += catch_net.h;
 						catch_net.h *= -1;
+					}
+					else if (catch_net.h == 0)
+					{
+						catch_net.h = 1;
 					}
 					fade_net = catch_net;
 					catchunits(catch_net, beings, being_count);
