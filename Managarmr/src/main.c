@@ -47,9 +47,9 @@ static intbound selection_colour[4] = {255, 0, 0, 255};
 static intbound interpreter_open = 0;
 static intbound sys_running = 1;
 static intbound scene_drawtargets;
-static int window_width  = 800;
-static int window_height = 600;
-static int window_vsync  = 1;
+static intbound window_width  = 800;
+static intbound window_height = 600;
+static intbound window_vsync  = 1;
 static charbound window_title[WINDOW_TITLE_MAX] = "~mánagarmr";
 
 static void
