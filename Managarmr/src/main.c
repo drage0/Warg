@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include "render.h"
 #include "lua.h"
 #include "utility.h"
@@ -25,6 +26,12 @@ struct KeyBind
 };
 static struct KeyBind keybinds[KEYBIND_MAX];
 static unsigned int keybind_count = 0;
+
+/* Predefined colours */
+static const SDL_Color COLOUR_WHITE = {255, 255, 255, 255};
+
+/* Font drawing system */
+TTF_Font *font_default;
 
 /* Window system */
 #define WINDOW_TITLE_MAX 64
@@ -333,6 +340,25 @@ statusbar_draw(void)
 }
 
 /*
+ * Draw the ingame console and its messages.
+ */
+static void
+console_draw(void)
+{
+	SDL_Rect rectangle;
+	char *message        = "Quick, look behind you!";
+	SDL_Surface *surface = TTF_RenderText_Solid(font_default, message, COLOUR_WHITE);
+	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+	rectangle.x = 0;
+	rectangle.y = 0;
+	rectangle.w = surface->w;
+	rectangle.h = surface->h;
+	SDL_RenderCopy(renderer, texture, NULL, &rectangle);
+	SDL_FreeSurface(surface);
+	SDL_DestroyTexture(texture);
+}
+
+/*
  * Set a new movement target to all selected units.
  */
 static void
@@ -393,6 +419,7 @@ main(int argc, char **argv)
 
 	welcomemessage();
 	SDL_Init(SDL_INIT_EVERYTHING);
+	TTF_Init();
 
 	/* Begin the Lua state */
 	lstate = luaL_newstate();
@@ -407,6 +434,13 @@ main(int argc, char **argv)
 	lua_setglobal(lstate, "quit");
 	lua_pushcfunction(lstate, lua_scene_toggletargets);
 	lua_setglobal(lstate, "toggletargets");
+
+	/* Load fonts */
+	font_default = TTF_OpenFont("./data/fonts/LinLibertine_M.otf", 24);
+	if (!font_default)
+	{
+		printissue("Couldn't load font %s. SDL2_TTF says: %s", "Sans.ttf", TTF_GetError());
+	}
 
 	/* Execute the configuration script. */
 	executescript(lstate, "./data/scripts/configuration.lua");
@@ -542,10 +576,12 @@ main(int argc, char **argv)
 			}
 		}
 		statusbar_draw();
+		console_draw();
 		SDL_RenderPresent(renderer);
 	}
 
 	lua_close(lstate);
+	TTF_Quit();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();

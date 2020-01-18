@@ -9,7 +9,7 @@ CFLAGS=-g $(shell sdl2-config --cflags)
 SKOLL_DIR=../../Skoll/out
 OUTPUT_DIR=../out
 BUILD_DIR=../build
-LIBS=-L$(SKOLL_DIR) -llua $(shell sdl2-config --libs) -lm -ldl
+LIBS=-L$(SKOLL_DIR) -llua $(shell sdl2-config --libs) -lSDL2_ttf -lm -ldl
 
 
 all: $(BUILD_DIR)/main.o $(BUILD_DIR)/being.o $(BUILD_DIR)/render.o $(OUTPUT_DIR)/managarmr
